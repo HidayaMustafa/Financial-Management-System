@@ -1,0 +1,60 @@
+2024-08-14 11:22:12 - Info: Program start .
+2024-08-14 11:22:12 - Info: Budget for Food set to  150.00 $.
+
+2024-08-14 11:22:12 - Info: Budget for Shoes set to  300.00 $.
+
+2024-08-14 11:22:12 - Info: Transaction ID 0 -- 300.00 $ deposited successfully.
+
+2024-08-14 11:22:12 - Info: Transaction ID 1 -- 100.00 $ withdrawn successfully from Food.
+
+2024-08-14 11:22:12 - Info: Transaction ID 2 -- 100.00 $ withdrawn successfully from Shoes.
+
+2024-08-14 11:22:12 - Error: Transaction ID 0 -- failed to update deposited to withdraw.
+
+2024-08-14 11:22:12 - Error: Transaction ID 0 can't be deleted, would result in negative balance.
+
+2024-08-14 11:22:12 - Info: Program End .
+2024-08-14 11:34:28 - Info: Program start .
+2024-08-14 11:34:28 - Info: Budget for Food set to  150.00 $.
+
+2024-08-14 11:34:28 - Info: Budget for Shoes set to  300.00 $.
+
+2024-08-14 11:34:28 - Info: Transaction ID 0 -- 300.00 $ deposited successfully.
+
+2024-08-14 11:34:28 - Info: Transaction ID 1 -- 100.00 $ withdrawn successfully from Food.
+
+2024-08-14 11:34:28 - Info: Transaction ID 2 -- 30.00 $ withdrawn successfully from Food.
+
+2024-08-14 11:34:28 - Info: Program End .
+2024-08-14 11:36:18 - Info: Program start .
+2024-08-14 11:36:18 - Info: Budget for Food set to  150.00 $.
+
+2024-08-14 11:36:18 - Info: Budget for Shoes set to  300.00 $.
+
+2024-08-14 11:36:18 - Info: Transaction ID 0 -- 300.00 $ deposited successfully.
+
+2024-08-14 11:36:18 - Info: Transaction ID 1 -- 100.00 $ withdrawn successfully from Food.
+
+2024-08-14 11:36:18 - Info: Transaction ID 2 -- 30.00 $ withdrawn successfully from Food.
+
+2024-08-14 11:36:18 - Warn: The budget in Food has decreased to below 80% of its previous amount.
+2024-08-14 11:36:18 - Info: Program End .
+2024-08-14 12:21:25 - Info: Program start .
+2024-08-14 12:21:25 - Info: Budget for Food set to  150.00 $.
+
+2024-08-14 12:21:25 - Info: Budget for Shoes set to  300.00 $.
+
+2024-08-14 12:21:25 - Info: Transaction ID 0 -- 300.00 $ deposited successfully.
+
+2024-08-14 12:21:25 - Info: Transaction ID 1 -- 100.00 $ withdrawn successfully from Food.
+
+2024-08-14 12:21:25 - Info: Transaction ID 2 -- 30.00 $ withdrawn successfully from Food.
+
+2024-08-14 12:21:25 - Warn: The budget in Food has decreased to below 80% of its previous amount.
+2024-08-14 12:21:25 - Info: Transaction ID 2 -- 100.00 $ withdrawn successfully from Shoes.
+
+2024-08-14 12:21:25 - Error: Transaction ID 0 -- failed to update deposited to withdraw.
+
+2024-08-14 12:21:25 - Error: Transaction ID 0 can't be deleted, would result in negative balance.
+
+2024-08-14 12:21:25 - Info: Program End .
