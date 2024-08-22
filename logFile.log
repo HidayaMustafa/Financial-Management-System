@@ -1,60 +1,186 @@
-2024-08-14 11:22:12 - Info: Program start .
-2024-08-14 11:22:12 - Info: Budget for Food set to  150.00 $.
-
-2024-08-14 11:22:12 - Info: Budget for Shoes set to  300.00 $.
-
-2024-08-14 11:22:12 - Info: Transaction ID 0 -- 300.00 $ deposited successfully.
-
-2024-08-14 11:22:12 - Info: Transaction ID 1 -- 100.00 $ withdrawn successfully from Food.
-
-2024-08-14 11:22:12 - Info: Transaction ID 2 -- 100.00 $ withdrawn successfully from Shoes.
-
-2024-08-14 11:22:12 - Error: Transaction ID 0 -- failed to update deposited to withdraw.
-
-2024-08-14 11:22:12 - Error: Transaction ID 0 can't be deleted, would result in negative balance.
-
-2024-08-14 11:22:12 - Info: Program End .
-2024-08-14 11:34:28 - Info: Program start .
-2024-08-14 11:34:28 - Info: Budget for Food set to  150.00 $.
-
-2024-08-14 11:34:28 - Info: Budget for Shoes set to  300.00 $.
-
-2024-08-14 11:34:28 - Info: Transaction ID 0 -- 300.00 $ deposited successfully.
-
-2024-08-14 11:34:28 - Info: Transaction ID 1 -- 100.00 $ withdrawn successfully from Food.
-
-2024-08-14 11:34:28 - Info: Transaction ID 2 -- 30.00 $ withdrawn successfully from Food.
-
-2024-08-14 11:34:28 - Info: Program End .
-2024-08-14 11:36:18 - Info: Program start .
-2024-08-14 11:36:18 - Info: Budget for Food set to  150.00 $.
-
-2024-08-14 11:36:18 - Info: Budget for Shoes set to  300.00 $.
-
-2024-08-14 11:36:18 - Info: Transaction ID 0 -- 300.00 $ deposited successfully.
-
-2024-08-14 11:36:18 - Info: Transaction ID 1 -- 100.00 $ withdrawn successfully from Food.
-
-2024-08-14 11:36:18 - Info: Transaction ID 2 -- 30.00 $ withdrawn successfully from Food.
-
-2024-08-14 11:36:18 - Warn: The budget in Food has decreased to below 80% of its previous amount.
-2024-08-14 11:36:18 - Info: Program End .
-2024-08-14 12:21:25 - Info: Program start .
-2024-08-14 12:21:25 - Info: Budget for Food set to  150.00 $.
-
-2024-08-14 12:21:25 - Info: Budget for Shoes set to  300.00 $.
-
-2024-08-14 12:21:25 - Info: Transaction ID 0 -- 300.00 $ deposited successfully.
-
-2024-08-14 12:21:25 - Info: Transaction ID 1 -- 100.00 $ withdrawn successfully from Food.
-
-2024-08-14 12:21:25 - Info: Transaction ID 2 -- 30.00 $ withdrawn successfully from Food.
-
-2024-08-14 12:21:25 - Warn: The budget in Food has decreased to below 80% of its previous amount.
-2024-08-14 12:21:25 - Info: Transaction ID 2 -- 100.00 $ withdrawn successfully from Shoes.
-
-2024-08-14 12:21:25 - Error: Transaction ID 0 -- failed to update deposited to withdraw.
-
-2024-08-14 12:21:25 - Error: Transaction ID 0 can't be deleted, would result in negative balance.
-
-2024-08-14 12:21:25 - Info: Program End .
+By : Hidaya Mustafa || 2024-08-20 23:53:24 - Info:  Program start.
+By : Hidaya Mustafa || 2024-08-20 23:53:24 - Info:  Budget for Food set to 300.00 $.
+By : Hidaya Mustafa || 2024-08-20 23:53:24 - Info:  Budget for Shoes set to 300.00 $.
+By : Hidaya Mustafa || 2024-08-20 23:53:24 - Info:  Transaction ID 0 -- 300.00 $ deposited successfully.
+By : Hidaya Mustafa || 2024-08-20 23:53:24 - Info:  Transaction ID 1 -- 200.00 $ withdrawn successfully from Food.
+By : Hidaya Mustafa || 2024-08-20 23:53:24 - Info: Saving plan 0 added.
+By :  || 2024-08-20 23:53:24 - Info: Saving plane 0 deleted 
+By : Hidaya Mustafa || 2024-08-20 23:53:24 - Info: 100.00 $ added successfully to saving plan 0.
+By : Hidaya Mustafa || 2024-08-20 23:53:24 - Error:  You didn't achieve your savings target within the limit time.
+By : Hidaya Mustafa || 2024-08-20 23:53:24 - Info: Saving plan 0 updated successfully.
+By : Hidaya Mustafa || 2024-08-20 23:53:24 - Info:  Good job, You have met your saving target in the 5 days.
+By : Hidaya Mustafa || 2024-08-20 23:53:24 - Info: Saving plan 1 added.
+By :  || 2024-08-20 23:53:24 - Info: Saving plane 0 deleted 
+By :  || 2024-08-20 23:53:24 - Info: Saving plane 1 deleted 
+By : Hidaya Mustafa || 2024-08-20 23:53:24 - Info:  Transaction ID 0 -- 100.00 $ deposited successfully.
+By : Hidaya Mustafa || 2024-08-20 23:53:24 - Info: Saving plan 0 deleted successfully.
+By :  || 2024-08-20 23:53:24 - Info: Saving plane 1 deleted 
+By :  || 2024-08-20 23:53:24 - Info: Saving plane 1 deleted 
+By : Hidaya Mustafa || 2024-08-20 23:53:24 - Info:  Program End.
+By : Hidaya Mustafa || 2024-08-20 23:56:36 - Info:  Program start.
+By : Hidaya Mustafa || 2024-08-20 23:56:36 - Info:  Budget for Food set to 300.00 $.
+By : Hidaya Mustafa || 2024-08-20 23:56:36 - Info:  Budget for Shoes set to 300.00 $.
+By : Hidaya Mustafa || 2024-08-20 23:56:36 - Info:  Transaction ID 0 -- 300.00 $ deposited successfully.
+By : Hidaya Mustafa || 2024-08-20 23:56:36 - Info:  Transaction ID 1 -- 200.00 $ withdrawn successfully from Food.
+By : Hidaya Mustafa || 2024-08-20 23:56:36 - Info: Saving plan 0 added.
+By : Hidaya Mustafa || 2024-08-20 23:56:36 - Info: Saving plane 0 deleted 
+By : Hidaya Mustafa || 2024-08-20 23:56:36 - Info: 100.00 $ added successfully to saving plan 0.
+By : Hidaya Mustafa || 2024-08-20 23:56:36 - Error:  You didn't achieve your savings target within the limit time.
+By : Hidaya Mustafa || 2024-08-20 23:56:36 - Info: Saving plan 0 updated successfully.
+By : Hidaya Mustafa || 2024-08-20 23:56:36 - Info:  Good job, You have met your saving target in the 5 days.
+By : Hidaya Mustafa || 2024-08-20 23:56:36 - Info: Saving plan 1 added.
+By : Hidaya Mustafa || 2024-08-20 23:56:36 - Info: Saving plane 0 deleted 
+By : Hidaya Mustafa || 2024-08-20 23:56:36 - Info: Saving plane 1 deleted 
+By : Hidaya Mustafa || 2024-08-20 23:56:36 - Info:  Transaction ID 0 -- 100.00 $ deposited successfully.
+By : Hidaya Mustafa || 2024-08-20 23:56:36 - Info: Saving plan 0 deleted successfully.
+By : Hidaya Mustafa || 2024-08-20 23:56:36 - Info: Saving plane 1 deleted 
+By : Hidaya Mustafa || 2024-08-20 23:56:36 - Info: Saving plane 1 deleted 
+By : Hidaya Mustafa || 2024-08-20 23:56:36 - Info:  Program End.
+By : Hidaya Mustafa || 2024-08-20 23:58:22 - Info:  Program start.
+By : Hidaya Mustafa || 2024-08-20 23:58:22 - Info:  Budget for Food set to 300.00 $.
+By : Hidaya Mustafa || 2024-08-20 23:58:22 - Info:  Budget for Shoes set to 300.00 $.
+By : Hidaya Mustafa || 2024-08-20 23:58:22 - Info:  Transaction ID 0 -- 300.00 $ deposited successfully.
+By : Hidaya Mustafa || 2024-08-20 23:58:22 - Info:  Transaction ID 1 -- 200.00 $ withdrawn successfully from Food.
+By : Hidaya Mustafa || 2024-08-20 23:58:22 - Info:  Saving plan 0 added.
+By : Hidaya Mustafa || 2024-08-20 23:58:22 - Info:  Saving plane 0 deleted 
+By : Hidaya Mustafa || 2024-08-20 23:58:22 - Info:  100.00 $ added successfully to saving plan 0.
+By : Hidaya Mustafa || 2024-08-20 23:58:22 - Error:  You didn't achieve your savings target within the limit time.
+By : Hidaya Mustafa || 2024-08-20 23:58:22 - Info:  Saving plan 0 updated successfully.
+By : Hidaya Mustafa || 2024-08-20 23:58:22 - Info:  Good job, You have met your saving target in the 5 days.
+By : Hidaya Mustafa || 2024-08-20 23:58:22 - Info:  Saving plan 1 added.
+By : Hidaya Mustafa || 2024-08-20 23:58:22 - Info:  Saving plane 0 deleted 
+By : Hidaya Mustafa || 2024-08-20 23:58:22 - Info:  Saving plane 1 deleted 
+By : Hidaya Mustafa || 2024-08-20 23:58:22 - Info:  Transaction ID 0 -- 100.00 $ deposited successfully.
+By : Hidaya Mustafa || 2024-08-20 23:58:22 - Info:  Saving plan 0 deleted successfully.
+By : Hidaya Mustafa || 2024-08-20 23:58:22 - Info:  Saving plane 1 deleted 
+By : Hidaya Mustafa || 2024-08-20 23:58:22 - Info:  Saving plane 1 deleted 
+By : Hidaya Mustafa || 2024-08-20 23:58:22 - Info:  Program End.
+By : Hidaya Mustafa || 2024-08-21 00:00:23 - Info:  Program start.
+By : Hidaya Mustafa || 2024-08-21 00:00:23 - Info:  Budget for Food set to 300.00 $.
+By : Hidaya Mustafa || 2024-08-21 00:00:23 - Info:  Budget for Shoes set to 300.00 $.
+By : Hidaya Mustafa || 2024-08-21 00:00:23 - Info:  Transaction ID 0 -- 300.00 $ deposited successfully.
+By : Hidaya Mustafa || 2024-08-21 00:00:23 - Info:  Transaction ID 1 -- 200.00 $ withdrawn successfully from Food.
+By : Hidaya Mustafa || 2024-08-21 00:00:23 - Info:  Saving plan 0 added.
+By : Hidaya Mustafa || 2024-08-21 00:00:23 - Info:  Saving plane 0 deleted 
+By : Hidaya Mustafa || 2024-08-21 00:00:23 - Info:  100.00 $ added successfully to saving plan 0.
+By : Hidaya Mustafa || 2024-08-21 00:00:23 - Error:  You didn't achieve your savings target within the limit time.
+By : Hidaya Mustafa || 2024-08-21 00:00:23 - Info:  Saving plan 0 updated successfully.
+By : Hidaya Mustafa || 2024-08-21 00:00:23 - Info:  Good job, You have met your saving target in the 5 days.
+By : Hidaya Mustafa || 2024-08-21 00:00:23 - Info:  Saving plan 1 added.
+By : Hidaya Mustafa || 2024-08-21 00:00:23 - Info:  Saving plane 0 deleted 
+By : Hidaya Mustafa || 2024-08-21 00:00:23 - Info:  Saving plane 1 deleted 
+By : Hidaya Mustafa || 2024-08-21 00:00:23 - Info:  Transaction ID 0 -- 100.00 $ deposited successfully.
+By : Hidaya Mustafa || 2024-08-21 00:00:23 - Info:  Saving plan 0 deleted successfully.
+By : Hidaya Mustafa || 2024-08-21 00:00:23 - Info:  Saving plane 1 deleted 
+By : Hidaya Mustafa || 2024-08-21 00:00:23 - Info:  Saving plane 1 deleted 
+By : Hidaya Mustafa || 2024-08-21 00:00:23 - Info:  Program End.
+By : Hidaya Mustafa || 2024-08-21 00:00:50 - Info:  Program start.
+By : Hidaya Mustafa || 2024-08-21 00:00:50 - Info:  Budget for Food set to 300.00 $.
+By : Hidaya Mustafa || 2024-08-21 00:00:50 - Info:  Budget for Shoes set to 300.00 $.
+By : Hidaya Mustafa || 2024-08-21 00:00:50 - Info:  Transaction ID 0 -- 300.00 $ deposited successfully.
+By : Hidaya Mustafa || 2024-08-21 00:00:50 - Info:  Transaction ID 1 -- 200.00 $ withdrawn successfully from Food.
+By : Hidaya Mustafa || 2024-08-21 00:00:50 - Info:  Saving plan 0 added.
+By : Hidaya Mustafa || 2024-08-21 00:00:50 - Info:  Saving plane 0 deleted 
+By : Hidaya Mustafa || 2024-08-21 00:00:50 - Info:  100.00 $ added successfully to saving plan 0.
+By : Hidaya Mustafa || 2024-08-21 00:00:50 - Error: You didn't achieve your savings target within the limit time.
+By : Hidaya Mustafa || 2024-08-21 00:00:50 - Info:  Saving plan 0 updated successfully.
+By : Hidaya Mustafa || 2024-08-21 00:00:50 - Info:  Good job, You have met your saving target in the 5 days.
+By : Hidaya Mustafa || 2024-08-21 00:00:50 - Info:  Saving plan 1 added.
+By : Hidaya Mustafa || 2024-08-21 00:00:50 - Info:  Saving plane 0 deleted 
+By : Hidaya Mustafa || 2024-08-21 00:00:50 - Info:  Saving plane 1 deleted 
+By : Hidaya Mustafa || 2024-08-21 00:00:50 - Info:  Transaction ID 0 -- 100.00 $ deposited successfully.
+By : Hidaya Mustafa || 2024-08-21 00:00:50 - Info:  Saving plan 0 deleted successfully.
+By : Hidaya Mustafa || 2024-08-21 00:00:50 - Info:  Saving plane 1 deleted 
+By : Hidaya Mustafa || 2024-08-21 00:00:50 - Info:  Saving plane 1 deleted 
+By : Hidaya Mustafa || 2024-08-21 00:00:50 - Info:  Program End.
+By : Hidaya Mustafa || 2024-08-21 13:58:12 - Info:  Program start.
+By : Hidaya Mustafa || 2024-08-21 13:58:12 - Info:  Budget for Food set to 300.00 $.
+By : Hidaya Mustafa || 2024-08-21 13:58:12 - Info:  Budget for Shoes set to 300.00 $.
+By : Hidaya Mustafa || 2024-08-21 13:58:12 - Info:  Transaction ID 0 -- 300.00 $ deposited successfully.
+By : Hidaya Mustafa || 2024-08-21 13:58:12 - Info:  Transaction ID 1 -- 200.00 $ withdrawn successfully from Food.
+By : Hidaya Mustafa || 2024-08-21 13:58:12 - Info:  Saving plan 0 added.
+By : Hidaya Mustafa || 2024-08-21 13:58:12 - Info:  Saving plane 0 deleted 
+By : Hidaya Mustafa || 2024-08-21 13:58:12 - Info:  100.00 $ added successfully to saving plan 0.
+By : Hidaya Mustafa || 2024-08-21 13:58:12 - Error: You didn't achieve your savings target within the limit time.
+By : Hidaya Mustafa || 2024-08-21 13:58:12 - Info:  Saving plan 0 updated successfully.
+By : Hidaya Mustafa || 2024-08-21 13:58:12 - Info:  Good job, You have met your saving target in the 5 days.
+By : Hidaya Mustafa || 2024-08-21 13:58:12 - Info:  Saving plan 1 added.
+By : Hidaya Mustafa || 2024-08-21 13:58:12 - Info:  Saving plane 0 deleted 
+By : Hidaya Mustafa || 2024-08-21 13:58:12 - Info:  Saving plane 1 deleted 
+By : Hidaya Mustafa || 2024-08-21 13:58:12 - Info:  Transaction ID 0 -- 100.00 $ deposited successfully.
+By : Hidaya Mustafa || 2024-08-21 13:58:12 - Info:  Saving plan 0 deleted successfully.
+By : Hidaya Mustafa || 2024-08-21 13:58:12 - Info:  Saving plane 1 deleted 
+By : Hidaya Mustafa || 2024-08-21 13:58:12 - Info:  Saving plane 1 deleted 
+By : Hidaya Mustafa || 2024-08-21 13:58:12 - Info:  Program End.
+By : Hidaya Mustafa || 2024-08-21 14:46:42 - Info:  Program start.
+By : Hidaya Mustafa || 2024-08-21 14:46:42 - Info:  Budget for Food set to 300.00 $.
+By : Hidaya Mustafa || 2024-08-21 14:46:42 - Info:  Budget for Shoes set to 300.00 $.
+By : Hidaya Mustafa || 2024-08-21 14:46:42 - Info:  Transaction ID 0 -- 300.00 $ deposited successfully.
+By : Hidaya Mustafa || 2024-08-21 14:46:42 - Info:  Transaction ID 1 -- 200.00 $ withdrawn successfully from Food.
+By : Hidaya Mustafa || 2024-08-21 14:46:42 - Info:  Saving plan 0 added.
+By : Hidaya Mustafa || 2024-08-21 14:46:42 - Info: Saving plan 0 created.
+By : Hidaya Mustafa || 2024-08-21 14:46:42 - Info:  Saving plane 0 deleted 
+By : Hidaya Mustafa || 2024-08-21 14:46:42 - Info:  100.00 $ added successfully to saving plan 0.
+By : Hidaya Mustafa || 2024-08-21 14:46:42 - Error: You didn't achieve your savings target within the limit time.
+By : Hidaya Mustafa || 2024-08-21 14:46:42 - Info:  Saving plan 0 updated successfully.
+By : Hidaya Mustafa || 2024-08-21 14:46:42 - Info:  Good job, You have met your saving target in the 5 days.
+By : Hidaya Mustafa || 2024-08-21 14:46:42 - Info:  Saving plan 1 added.
+By : Hidaya Mustafa || 2024-08-21 14:46:42 - Info: Saving plan 1 created.
+By : Hidaya Mustafa || 2024-08-21 14:46:42 - Info:  Saving plane 0 deleted 
+By : Hidaya Mustafa || 2024-08-21 14:46:42 - Info:  Saving plane 1 deleted 
+By : Hidaya Mustafa || 2024-08-21 14:46:42 - Info:  Transaction ID 0 -- 100.00 $ deposited successfully.
+By : Hidaya Mustafa || 2024-08-21 14:46:42 - Info:  Saving plan 0 deleted successfully.
+By : Hidaya Mustafa || 2024-08-21 14:46:42 - Info:  Saving plane 1 deleted 
+By : Hidaya Mustafa || 2024-08-21 14:46:42 - Info:  Saving plane 1 deleted 
+By : Hidaya Mustafa || 2024-08-21 14:46:42 - Info:  Program End.
+By : Hidaya Mustafa || 2024-08-21 14:49:34 - Info:  Program start.
+By : Hidaya Mustafa || 2024-08-21 14:49:34 - Info:  Budget for Food set to 300.00 $.
+By : Hidaya Mustafa || 2024-08-21 14:49:34 - Info:  Budget for Shoes set to 300.00 $.
+By : Hidaya Mustafa || 2024-08-21 14:49:34 - Info:  Transaction ID 0 -- 300.00 $ deposited successfully.
+By : Hidaya Mustafa || 2024-08-21 14:49:34 - Info:  Transaction ID 1 -- 200.00 $ withdrawn successfully from Food.
+By : Hidaya Mustafa || 2024-08-21 14:49:34 - Info: Saving plan 0 created.
+By : Hidaya Mustafa || 2024-08-21 14:49:34 - Info:  Saving plane 0 deleted 
+By : Hidaya Mustafa || 2024-08-21 14:49:34 - Info:  100.00 $ added successfully to saving plan 0.
+By : Hidaya Mustafa || 2024-08-21 14:49:34 - Error: You didn't achieve your savings target within the limit time.
+By : Hidaya Mustafa || 2024-08-21 14:49:34 - Info:  Saving plan 0 updated successfully.
+By : Hidaya Mustafa || 2024-08-21 14:49:34 - Info:  Good job, You have met your saving target in the 5 days.
+By : Hidaya Mustafa || 2024-08-21 14:49:34 - Info: Saving plan 1 created.
+By : Hidaya Mustafa || 2024-08-21 14:49:34 - Info:  Saving plane 1 deleted 
+By : Hidaya Mustafa || 2024-08-21 14:49:34 - Info:  Saving plane 1 deleted 
+By : Hidaya Mustafa || 2024-08-21 14:49:34 - Info:  Saving plane 1 deleted 
+By : Hidaya Mustafa || 2024-08-21 14:49:34 - Info:  Program End.
+By : Hidaya Mustafa || 2024-08-21 15:07:35 - Info:  Program start.
+By : Hidaya Mustafa || 2024-08-21 15:07:35 - Info:  Budget for Food set to 300.00 $.
+By : Hidaya Mustafa || 2024-08-21 15:07:35 - Info:  Budget for Shoes set to 300.00 $.
+By : Hidaya Mustafa || 2024-08-21 15:07:35 - Info:  Transaction ID 0 -- 300.00 $ deposited successfully.
+By : Hidaya Mustafa || 2024-08-21 15:07:35 - Info:  Transaction ID 1 -- 200.00 $ withdrawn successfully from Food.
+By : Hidaya Mustafa || 2024-08-21 15:07:35 - Info: Saving plan 0 created.
+By : Hidaya Mustafa || 2024-08-21 15:07:35 - Info:  Saving plane 0 deleted 
+By : Hidaya Mustafa || 2024-08-21 15:07:35 - Info:  100.00 $ added successfully to saving plan 0.
+By : Hidaya Mustafa || 2024-08-21 15:07:35 - Error: You didn't achieve your savings target within the limit time.
+By : Hidaya Mustafa || 2024-08-21 15:07:35 - Info:  Saving plan 0 updated successfully.
+By : Hidaya Mustafa || 2024-08-21 15:07:35 - Info:  Good job, You have met your saving target in the 5 days.
+By : Hidaya Mustafa || 2024-08-21 15:07:35 - Info: Saving plan 1 created.
+By : Hidaya Mustafa || 2024-08-21 15:07:35 - Info:  Saving plane 0 deleted 
+By : Hidaya Mustafa || 2024-08-21 15:07:35 - Info:  Saving plane 1 deleted 
+By : Hidaya Mustafa || 2024-08-21 15:07:35 - Info:  Transaction ID 0 -- 100.00 $ deposited successfully.
+By : Hidaya Mustafa || 2024-08-21 15:07:35 - Info:  Saving plan 0 deleted successfully.
+By : Hidaya Mustafa || 2024-08-21 15:07:35 - Info:  Saving plane 1 deleted 
+By : Hidaya Mustafa || 2024-08-21 15:07:35 - Info:  Saving plane 1 deleted 
+By : Hidaya Mustafa || 2024-08-21 15:07:35 - Info:  Program End.
+By : Hidaya Mustafa || 2024-08-21 15:08:02 - Info:  Program start.
+By : Hidaya Mustafa || 2024-08-21 15:08:02 - Info:  Budget for Food set to 300.00 $.
+By : Hidaya Mustafa || 2024-08-21 15:08:02 - Info:  Budget for Shoes set to 300.00 $.
+By : Hidaya Mustafa || 2024-08-21 15:08:02 - Info:  Transaction ID 0 -- 300.00 $ deposited successfully.
+By : Hidaya Mustafa || 2024-08-21 15:08:02 - Info:  Transaction ID 1 -- 200.00 $ withdrawn successfully from Food.
+By : Hidaya Mustafa || 2024-08-21 15:08:02 - Info: Saving plan 0 created.
+By : Hidaya Mustafa || 2024-08-21 15:08:02 - Info:  100.00 $ added successfully to saving plan 0.
+By : Hidaya Mustafa || 2024-08-21 15:08:02 - Error: You didn't achieve your savings target within the limit time.
+By : Hidaya Mustafa || 2024-08-21 15:08:02 - Info: Saving plan 0 updated successfully.
+By : Hidaya Mustafa || 2024-08-21 15:08:02 - Info:  Good job, You have met your saving target in the 5 days.
+By : Hidaya Mustafa || 2024-08-21 15:08:02 - Info: Saving plan 1 created.
+By : Hidaya Mustafa || 2024-08-21 15:08:02 - Info:  Transaction ID 0 -- 100.00 $ deposited successfully.
+By : Hidaya Mustafa || 2024-08-21 15:08:02 - Info: Saving plan 0 deleted successfully.
+By : Hidaya Mustafa || 2024-08-21 15:08:02 - Info:  Saving plane 0 deleted 
+By : Hidaya Mustafa || 2024-08-21 15:08:02 - Info:  Saving plane 1 deleted 
+By : Hidaya Mustafa || 2024-08-21 15:08:02 - Info:  Program End.

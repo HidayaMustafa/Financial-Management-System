@@ -9,6 +9,12 @@
 
 using namespace std;
 
+enum LogLevel{
+    Info,
+    Error,
+    Warn
+};
+
 class Logger {
 private:
     static Logger* instance;
@@ -43,38 +49,26 @@ public:
     }
 
     template<typename... Args>
-    void log(const char* message, Args... args) {
+    void log(LogLevel type , string userName, const char* message, Args... args) {
         lock_guard<mutex> lock(mutex_);
         if (logFile.is_open()) {
             char buffer[256];
             snprintf(buffer, sizeof(buffer), message, args...);
-            logFile << getCurrentTime() << " - Info: " << buffer << endl;
+            logFile << "By : "<< userName <<" || "<< getCurrentTime() << " - "<< printType(type) << ": " << buffer<< endl;
         } else {
             cerr << "Log file is not open" << endl;
         }
     }
 
-    template<typename... Args>
-    void warn(const char* message, Args... args) {
-        lock_guard<mutex> lock(mutex_);
-        if (logFile.is_open()) {
-            char buffer[256];
-            snprintf(buffer, sizeof(buffer), message, args...);
-            logFile << getCurrentTime() << " - Warn: " << buffer << endl;
-        } else {
-            cerr << "Log file is not open" << endl;
-        }
-    }
-
-    template<typename... Args>
-    void error(const char* message, Args... args) {
-        lock_guard<mutex> lock(mutex_);
-        if (logFile.is_open()) {
-            char buffer[256];
-            snprintf(buffer, sizeof(buffer), message, args...);
-            logFile << getCurrentTime() << " - Error: " << buffer << endl;
-        } else {
-            cerr << "Log file is not open" << endl;
+    string printType(LogLevel t) {
+        switch (t) {
+        case Info:
+            return "Info";
+        case Warn:
+            return "Warn";
+        case Error:
+            return "Error";
+        return "";
         }
     }
 
