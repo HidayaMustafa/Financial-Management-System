@@ -15,38 +15,36 @@ private:
 
 public:
     Wallet(const string& user) : userName(user) {
-        Logger::getInstance()->log(Info, userName ," Program start.");
+        Logger::getInstance()->log(Info, userName, " Program start.");
     }
 
     ~Wallet() {
-        Logger::getInstance()->log(Info, userName ," Program End.");
+        Logger::getInstance()->log(Info, userName, " Program End.");
     }
 
     void setBudget(Categories category, double budget) {
         if (categoryBudgets[category] < budget) {
             categoryBudgets[category] = budget;
-            Logger::getInstance()->log(Info, userName ," Budget for %s set to %.2f $.", printCategory(category), budget);
+            Logger::getInstance()->log(Info, userName, " Budget for %s set to %.2f $.", printCategory(category), budget);
         } else {
-            Logger::getInstance()->log(Error, userName ," Can't set budget for %s to a smaller value.", printCategory(category));
+            Logger::getInstance()->log(Error, userName, " Can't set budget for %s to a smaller value.", printCategory(category));
         }
     }
 
     const char* printCategory(Categories category) {
         switch (category) {
-        case Food:
+        case Categories::FOOD:
             return "Food";
-        case Clothes:
+        case Categories::CLOTHES:
             return "Clothes";
-        case Shoes:
+        case Categories::SHOES:
             return "Shoes";
-        case Electronics:
+        case Categories::ELECTRONICS:
             return "Electronics";
-        case Miscellaneous:
+        case Categories::MISCELLANEOUS:
             return "Miscellaneous";
-        case null:
-            return "None";
         }
-        return "";
+        return "NONE";
     }
 
     void updateTransaction(int id, TransactionType type, Categories category, double value) {
@@ -59,12 +57,12 @@ public:
             double currentAmount = transaction.getAmount();
 
             if (currentType == type) {
-                if (type == Deposit) {
+                if (type == TransactionType:: DEPOSIT) {
                     if (currentAmount != value) {
                         transaction.setAmount(value);
-                        transaction.setCategory(null);
+                        transaction.setCategory(Categories::MISCELLANEOUS); // Use a suitable default category or adjust as needed
                         transaction.updateDate();
-                        Logger::getInstance()->log(Info, userName ," Transaction ID %d -- updated deposit to %.2f $ --> deposited successfully.", id, value);
+                        Logger::getInstance()->log(Info, userName, " Transaction ID %d -- updated deposit to %.2f $ --> deposited successfully.", id, value);
                     }
                 } else {
                     double amountDifference = value - currentAmount;
@@ -72,59 +70,59 @@ public:
                         transaction.setAmount(value);
                         transaction.setCategory(category);
                         transaction.updateDate();
-                        Logger::getInstance()->log(Info, userName ," Transaction ID %d -- updated withdrawal to %.2f $ --> withdrawn successfully from %s.", id, value, printCategory(category));
+                        Logger::getInstance()->log(Info, userName, " Transaction ID %d -- updated withdrawal to %.2f $ --> withdrawn successfully from %s.", id, value, printCategory(category));
                     } else {
-                        Logger::getInstance()->log(Error, userName ,"Transaction ID %d -- failed to update.", id);
+                        Logger::getInstance()->log(Error, userName, "Transaction ID %d -- failed to update.", id);
                     }
                 }
             } else {
-                if (type == Deposit) {
-                    if (currentType == Withdraw) {
-                        transaction.setTransactionType(Deposit);
+                if (type == TransactionType:: DEPOSIT) {
+                    if (currentType == TransactionType::WITHDRAW) {
+                        transaction.setTransactionType(TransactionType:: DEPOSIT);
                         transaction.setAmount(value);
-                        transaction.setCategory(null);
+                        transaction.setCategory(Categories::MISCELLANEOUS);
                         transaction.updateDate();
-                        Logger::getInstance()->log(Info, userName ," Transaction ID %d -- updated withdrawal to deposit %.2f $ successfully.", id, value);
+                        Logger::getInstance()->log(Info, userName, " Transaction ID %d -- updated withdrawal to deposit %.2f $ successfully.", id, value);
                     }
                 } else {
                     if (checkBudget(category, value) && value < calculateTotal() - transaction.getAmount()) {
                         transaction.setAmount(value);
-                        transaction.setTransactionType(Withdraw);
+                        transaction.setTransactionType(TransactionType::WITHDRAW);
                         transaction.setCategory(category);
                         transaction.updateDate();
                         if (isWarnBudget(category)) {
-                            Logger::getInstance()->log(Warn, userName ," The budget in %s has decreased to below 80%% of its previous amount.", printCategory(category));
+                            Logger::getInstance()->log(Warn, userName, " The budget in %s has decreased to below 80%% of its previous amount.", printCategory(category));
                         }
-                        Logger::getInstance()->log(Info, userName ," Transaction ID %d -- updated deposit to withdrawal %.2f $ successfully from %s.", id, value, printCategory(category));
+                        Logger::getInstance()->log(Info, userName, " Transaction ID %d -- updated deposit to withdrawal %.2f $ successfully from %s.", id, value, printCategory(category));
                     } else {
-                        Logger::getInstance()->log(Error, userName ,"Transaction ID %d -- failed to update deposited to withdraw.", id);
+                        Logger::getInstance()->log(Error, userName, "Transaction ID %d -- failed to update deposit to withdrawal.", id);
                     }
                 }
             }
             return;
         }
-        Logger::getInstance()->log(Error, userName ,"Transaction ID %d not found, can't update.", id);
+        Logger::getInstance()->log(Error, userName, "Transaction ID %d not found, can't update.", id);
     }
 
     void deleteTransaction(int id) {
         for (auto i = transactions.begin(); i != transactions.end(); ++i) {
             if (i->getId() == id) {
-                if (i->getTransactionType() == Deposit) {
+                if (i->getTransactionType() == TransactionType:: DEPOSIT) {
                     if (calculateTotal() - i->getAmount() < 0) {
-                        Logger::getInstance()->log(Error, userName ,"Transaction ID %d can't be deleted, would result in negative balance.", id);
+                        Logger::getInstance()->log(Error, userName, "Transaction ID %d can't be deleted, would result in negative balance.", id);
                         return;
                     }
                 }
-                Logger::getInstance()->log(Info, userName ," Transaction ID %d deleted successfully.", id);
+                Logger::getInstance()->log(Info, userName, " Transaction ID %d deleted successfully.", id);
                 transactions.erase(i);
                 return;
             }
         }
-        Logger::getInstance()->log(Error, userName ,"Transaction ID %d not found, can't delete.", id);
+        Logger::getInstance()->log(Error, userName, "Transaction ID %d not found, can't delete.", id);
     }
 
     void addTransaction(int id, TransactionType type, Categories category, double value) {
-        if (type == Deposit) {
+        if (type == TransactionType:: DEPOSIT) {
             deposit(id, value, category);
         } else {
             withdraw(id, value, category);
@@ -132,97 +130,97 @@ public:
     }
 
     void deposit(int id, double value, Categories category) {
-        transactions.push_back(Transaction(id, value, category, Deposit));
-        Logger::getInstance()->log(Info, userName ," Transaction ID %d -- %.2f $ deposited successfully.", id, value);
+        transactions.push_back(Transaction(id, value, category, TransactionType:: DEPOSIT));
+        Logger::getInstance()->log(Info, userName, " Transaction ID %d -- %.2f $ deposited successfully.", id, value);
     }
 
     bool isWarnBudget(Categories category) {
-        return 0.8 * categoryBudgets[category] < calculateExpenses(category);
+        return 0.8 * categoryBudgets[category] < calculateExponses(category);
     }
 
     void withdraw(int id, double value, Categories category) {
         if (!checkBudget(category, value)) {
-            Logger::getInstance()->log(Error, userName ,"Withdraw of %.2f $ failed from %s. Exceeds budget.", value, printCategory(category));
+            Logger::getInstance()->log(Error, userName, "Withdraw of %.2f $ failed from %s. Exceeds budget.", value, printCategory(category));
             return;
         }
         if (calculateTotal() >= value) {
-            transactions.push_back(Transaction(id, value, category, Withdraw));
-            Logger::getInstance()->log(Info, userName ," Transaction ID %d -- %.2f $ withdrawn successfully from %s.", id, value, printCategory(category));
+            transactions.push_back(Transaction(id, value, category, TransactionType::WITHDRAW));
+            Logger::getInstance()->log(Info, userName, " Transaction ID %d -- %.2f $ withdrawn successfully from %s.", id, value, printCategory(category));
 
             if (isWarnBudget(category)) {
-                Logger::getInstance()->log(Warn, userName ," The budget in %s has decreased to below 80%% of its previous amount.", printCategory(category));
+                Logger::getInstance()->log(Warn, userName, " The budget in %s has decreased to below 80%% of its previous amount.", printCategory(category));
             }
         } else {
-            Logger::getInstance()->log(Error, userName ,"Withdraw of %.2f $ failed. Exceeds total balance.", value);
+            Logger::getInstance()->log(Error, userName, "Withdraw of %.2f $ failed. Exceeds total balance.", value);
         }
     }
 
-    double calculateIncomes() {
-        double totalIncomes = 0.0;
+    double calculateIncoms() {
+        double totalIncoms = 0.0;
         for (auto &transaction : transactions) {
-            if (transaction.getTransactionType() == Deposit) {
-                totalIncomes += transaction.getAmount();
+            if (transaction.getTransactionType() == TransactionType:: DEPOSIT) {
+                totalIncoms += transaction.getAmount();
             }
         }
-        return totalIncomes;
+        return totalIncoms;
     }
 
-    double calculateIncomes(Date d1, Date d2) {
-        double totalIncomes = 0.0;
+    double calculateIncoms(Date d1, Date d2) {
+        double totalIncoms = 0.0;
         for (auto &transaction : transactions) {
-            if (transaction.getTransactionType() == Deposit && transaction.getDate() >= d1 && transaction.getDate() <= d2) {
-                totalIncomes += transaction.getAmount();
+            if (transaction.getTransactionType() == TransactionType:: DEPOSIT && transaction.getDate() >= d1 && transaction.getDate() <= d2) {
+                totalIncoms += transaction.getAmount();
             }
         }
-        return totalIncomes;
+        return totalIncoms;
     }
 
-    double calculateExpenses() {
-        double totalExpenses = 0.0;
+    double calculateExponses() {
+        double totalExponses = 0.0;
         for (auto &transaction : transactions) {
-            if (transaction.getTransactionType() == Withdraw) {
-                totalExpenses += transaction.getAmount();
+            if (transaction.getTransactionType() == TransactionType::WITHDRAW) {
+                totalExponses += transaction.getAmount();
             }
         }
-        return totalExpenses;
+        return totalExponses;
     }
 
-    double calculateExpenses(Categories category) {
-        double totalExpenses = 0.0;
+    double calculateExponses(Categories category) {
+        double totalExponses = 0.0;
         for (auto &transaction : transactions) {
-            if (transaction.getTransactionType() == Withdraw && transaction.getCategory() == category) {
-                totalExpenses += transaction.getAmount();
+            if (transaction.getTransactionType() == TransactionType::WITHDRAW && transaction.getCategory() == category) {
+                totalExponses += transaction.getAmount();
             }
         }
-        return totalExpenses;
+        return totalExponses;
     }
 
-    double calculateExpenses(Date d1, Date d2) {
-        double totalExpenses = 0.0;
+    double calculateExponses(Date d1, Date d2) {
+        double totalExponses = 0.0;
         for (auto &transaction : transactions) {
-            if (transaction.getTransactionType() == Withdraw && transaction.getDate() >= d1 && transaction.getDate() <= d2) {
-                totalExpenses += transaction.getAmount();
+            if (transaction.getTransactionType() == TransactionType::WITHDRAW && transaction.getDate() >= d1 && transaction.getDate() <= d2) {
+                totalExponses += transaction.getAmount();
             }
         }
-        return totalExpenses;
+        return totalExponses;
     }
 
-    double calculateExpenses(Date d1, Date d2, Categories category) {
-        double totalExpenses = 0.0;
+    double calculateExponses(Date d1, Date d2, Categories category) {
+        double totalExponses = 0.0;
         for (auto &transaction : transactions) {
-            if (transaction.getTransactionType() == Withdraw && transaction.getCategory() == category && transaction.getDate() >= d1 && transaction.getDate() <= d2) {
-                totalExpenses += transaction.getAmount();
+            if (transaction.getTransactionType() == TransactionType::WITHDRAW && transaction.getCategory() == category && transaction.getDate() >= d1 && transaction.getDate() <= d2) {
+                totalExponses += transaction.getAmount();
             }
         }
-        return totalExpenses;
+        return totalExponses;
     }
 
     double calculateTotal() {
-        return calculateIncomes() - calculateExpenses();
+        return calculateIncoms() - calculateExponses();
     }
 
     bool checkBudget(Categories category, double value) {
-        return categoryBudgets[category] >= calculateExpenses(category) + value;
+        return categoryBudgets[category] >= calculateExponses(category) + value;
     }
 
     bool checkBudget(double value) {
@@ -235,9 +233,9 @@ public:
     }
 
     void generateReport(Date d1, Date d2) {
-        double totalIncomes = calculateIncomes(d1, d2);
-        double totalExpenses = calculateExpenses(d1, d2);
-        double netTotal = totalIncomes - totalExpenses;
+        double totalIncoms = calculateIncoms(d1, d2);
+        double totalExponses = calculateExponses(d1, d2);
+        double netTotal = totalIncoms - totalExponses;
 
         cout << "Report from ";
         d1.display();
@@ -245,19 +243,19 @@ public:
         d2.display();
         cout << ":\n";
         cout << "---------------------------------\n";
-        cout << "Total Incomes: " << totalIncomes << "$\n";
-        cout << "Total Expenses: " << totalExpenses << "$\n";
+        cout << "Total Incoms: " << totalIncoms << "$\n";
+        cout << "Total Exponses: " << totalExponses << "$\n";
         cout << "Net Total: " << netTotal << "$\n";
         cout << "---------------------------------\n";
 
         for (auto &pair : categoryBudgets) {
             Categories category = pair.first;
             double budget = pair.second;
-            double expenses = calculateExpenses(d1, d2, category);
+            double Exponses = calculateExponses(d1, d2, category);
             cout << "Category: " << printCategory(category) << "\n";
             cout << "Budget: " << budget << "$\n";
-            cout << "Expenses: " << expenses << "$\n";
-            cout << "Remaining Budget: " << budget - expenses << "$\n";
+            cout << "Exponses: " << Exponses << "$\n";
+            cout << "Remaining Budget: " << budget - Exponses << "$\n";
             cout << "---------------------------------\n";
         }
     }

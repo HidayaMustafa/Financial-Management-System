@@ -9,7 +9,7 @@
 
 using namespace std;
 
-enum LogLevel{
+enum LogLevel {
     Info,
     Error,
     Warn
@@ -49,12 +49,13 @@ public:
     }
 
     template<typename... Args>
-    void log(LogLevel type , string userName, const char* message, Args... args) {
+    void log(LogLevel type, string userName, const char* message, Args... args) {
         lock_guard<mutex> lock(mutex_);
         if (logFile.is_open()) {
             char buffer[256];
             snprintf(buffer, sizeof(buffer), message, args...);
-            logFile << "By : "<< userName <<" || "<< getCurrentTime() << " - "<< printType(type) << ": " << buffer<< endl;
+            logFile << "By : " << userName << " || " << getCurrentTime() << " - "
+                    << printType(type) << ": " << buffer << endl;
         } else {
             cerr << "Log file is not open" << endl;
         }
@@ -68,7 +69,8 @@ public:
             return "Warn";
         case Error:
             return "Error";
-        return "";
+        default:
+            return "Unknown";
         }
     }
 
@@ -78,7 +80,6 @@ public:
         }
     }
 };
-
 
 Logger* Logger::instance = nullptr;
 mutex Logger::mutex_;

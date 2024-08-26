@@ -5,18 +5,18 @@
 
 using namespace std;
 
-enum Categories {
-    Food ,
-    Clothes ,
-    Shoes ,
-    Electronics ,
-    Miscellaneous ,
-    null
+enum class Categories {
+    FOOD ,
+    CLOTHES,
+    SHOES ,
+    ELECTRONICS ,
+    MISCELLANEOUS,
+    NONE
 };
 
-enum TransactionType {
-    Deposit,
-    Withdraw
+enum class TransactionType {
+    DEPOSIT,
+    WITHDRAW
 };
 
 class Date {

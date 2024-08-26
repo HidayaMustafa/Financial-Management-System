@@ -60,7 +60,7 @@ public:
         });
 
         if (it != plans.end()) {
-            wallet.addTransaction(Id, Deposit, null, (*it)->getSavingAmount());
+            wallet.addTransaction(Id, TransactionType::DEPOSIT , Categories::NONE, (*it)->getSavingAmount());
             Logger::getInstance()->log(Info, name, " Saving plan %d deleted successfully.", Id);
             plans.erase(it); 
         } else {
