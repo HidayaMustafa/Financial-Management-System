@@ -1,9 +1,0 @@
-{
-    "files.associations": {
-        "fstream": "cpp",
-        "system_error": "cpp",
-        "chrono": "cpp",
-        "iostream": "cpp"
-    },
-    "C_Cpp.errorSquiggles": "disabled"
-}
