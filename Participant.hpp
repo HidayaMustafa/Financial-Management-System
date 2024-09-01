@@ -16,5 +16,5 @@ public:
 
     void updatePaidValue(double newValue);
 
-    double getPaid() const;
+    double getPaid()const;
 };

@@ -7,15 +7,14 @@ const User& Participant::getUser() const {
     return user;
 }
 
-void Participant::updatePaidValue(double newValue) {
+void Participant::updatePaidValue(double newValue){
     if (paidValue + newValue <= requiredValue) {
         paidValue += newValue;
     } else {
-        
         // Logger::getInstance()->log(LogLevel::Error, user.getName(), "Can't add value more than required");
     }
 }
 
-double Participant::getPaid() const {
+double Participant::getPaid()const {
     return paidValue;
 }

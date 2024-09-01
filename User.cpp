@@ -1,11 +1,13 @@
 #include "User.hpp"
-
 #include "SharedTransaction.hpp"
+#include <memory>
+#include <algorithm>
 
 
 using namespace std;
 
-User::User(string Name, int Id) : id(Id), name(Name)
+
+User::User(const string& Name, int Id) : id(Id), name(Name)
 {
     //Logger::getInstance()->log(Info, name, " Program start.");
 }
@@ -21,14 +23,9 @@ const vector<Transaction>& User::getTransactions() const
 }
 
 
-string User::getName()
+const string& User::getName()const
 {
     return name;
-}
-
-void User::setName(string n)
-{
-    name = n;
 }
 
 int User::getId() const
@@ -41,7 +38,7 @@ void User::setId(int i)
     id = i;
 }
 
-void User::setSavingPlan(int id, double target, Date startDate, Date endDate)
+void User::setSavingPlan(int id, double target, const Date& startDate, const Date& endDate)
 {
     plans.push_back(make_unique<SavingPlan>(id, target, startDate, endDate, name));
 }
@@ -76,7 +73,7 @@ void User::deleteSavingPlan(int Id)
     }
 }
 
-void User::updateSavingPlan(int Id, double newTarget, Date newStartDate, Date newEndDate)
+void User::updateSavingPlan(int Id, double newTarget, const Date& newStartDate, const Date& newEndDate)
 {
     auto plan = getSavingPlan(Id);
     if (plan)
@@ -105,7 +102,7 @@ void User::setBudget(Categories category, double budget)
     }
 }
 
-const char *User::printCategory(Categories category)
+const char *User::printCategory(Categories category)const
 {
     switch (category)
     {
@@ -243,9 +240,9 @@ void User::deposit(int transId, double value, Categories category)
     //Logger::getInstance()->log(Info, name, " Transaction ID %d -- %.2f $ deposited successfully.", transId, value);
 }
 
-bool User::isWarnBudget(Categories category)
+bool User::isWarnBudget(Categories category)const
 {
-    return 0.8 * categoryBudgets[category] < calculateExponses(category);
+    return 0.8 * categoryBudgets.at(category) < calculateExponses(category);
 }
 
 void User::withdraw(int transId, double value, Categories category)
@@ -271,7 +268,7 @@ void User::withdraw(int transId, double value, Categories category)
     }
 }
 
-double User::calculateIncoms()
+double User::calculateIncoms()const
 {
     double totalIncoms = 0.0;
     for (auto &transaction : transactions)
@@ -284,7 +281,7 @@ double User::calculateIncoms()
     return totalIncoms;
 }
 
-double User::calculateIncoms(Date d1, Date d2)
+double User::calculateIncoms(const Date& d1, const Date& d2)const
 {
     double totalIncoms = 0.0;
     for (auto &transaction : transactions)
@@ -297,7 +294,7 @@ double User::calculateIncoms(Date d1, Date d2)
     return totalIncoms;
 }
 
-double User::calculateExponses()
+double User::calculateExponses()const
 {
     double totalExponses = 0.0;
     for (auto &transaction : transactions)
@@ -310,7 +307,7 @@ double User::calculateExponses()
     return totalExponses;
 }
 
-double User::calculateExponses(Categories category)
+double User::calculateExponses(Categories category)const
 {
     double totalExponses = 0.0;
     for (auto &transaction : transactions)
@@ -323,7 +320,7 @@ double User::calculateExponses(Categories category)
     return totalExponses;
 }
 
-double User::calculateExponses(Date d1, Date d2)
+double User::calculateExponses(const Date& d1, const Date& d2)const
 {
     double totalExponses = 0.0;
     for (auto &transaction : transactions)
@@ -336,7 +333,7 @@ double User::calculateExponses(Date d1, Date d2)
     return totalExponses;
 }
 
-double User::calculateExponses(Date d1, Date d2, Categories category)
+double User::calculateExponses(const Date& d1, const Date& d2, Categories category)const
 {
     double totalExponses = 0.0;
     for (auto &transaction : transactions)
@@ -349,17 +346,17 @@ double User::calculateExponses(Date d1, Date d2, Categories category)
     return totalExponses;
 }
 
-double User::calculateTotal()
+double User::calculateTotal()const
 {
     return calculateIncoms() - calculateExponses();
 }
 
-bool User::checkBudget(Categories category, double value)
+bool User::checkBudget(Categories category, double value)const
 {
-    return categoryBudgets[category] >= calculateExponses(category) + value;
+    return categoryBudgets.at(category) >= calculateExponses(category) + value;
 }
 
-void User::generateReport(Date d1, Date d2)
+void User::generateReport(const Date& d1, const Date& d2)const
 {
     double totalIncoms = calculateIncoms(d1, d2);
     double totalExponses = calculateExponses(d1, d2);
@@ -389,32 +386,31 @@ void User::generateReport(Date d1, Date d2)
     }
 }
 
-SharedTransaction &User::createSharedTransaction(int tranId, double amount, Categories cat, int reqValue)
-{
-    sharedTransactions.emplace_back(tranId, amount, cat);
-    SharedTransaction &sh = sharedTransactions.back();
-    //Logger::getInstance()->log(Info, name, "Shared Transaction ID %d created successfully for %s.", tranId, printCategory(cat));
-    sh.addParticipant(*this, 0.0, reqValue);
-    return sh;
-}
-
-vector<SharedTransaction>& User::getSharedTransaction() 
-{
-    return sharedTransactions;
-}
-
-
-
-void User::printSh()
-{
-    cout << "Shared Transactions for User " << name << " (ID: " << id << "):\n";
-    for (auto &sh : sharedTransactions)
-    {
-        cout << "Shared Transaction ID: " << sh.getTranId()
-                  << ", Amount: " << sh.getAmount()
-                  << ", Category: " << printCategory(sh.getCategory()) << '\n';
-        sh.printParticipants();
+void User::joinSharedTransaction(SharedTransaction& sh)const{
+    for (const auto& transaction : sharedTransactions) {
+        if (transaction->getTranId() == sh.getTranId()) {
+            return; 
+        }
     }
-    cout << "----------------------\n";
+    sharedTransactions.push_back(&sh);
 }
 
+void User::deleteSharedTransaction(SharedTransaction& transaction) {
+    // Remove the transaction from the vector of pointers
+    auto it = std::remove(sharedTransactions.begin(), sharedTransactions.end(), &transaction);
+    sharedTransactions.erase(it, sharedTransactions.end());
+}
+
+
+
+
+void User::printSharedTransaction() const {
+    std::cout << "Shared Transactions for User " << name << " (ID: " << id << "):\n";
+    for (const auto& sh : sharedTransactions) {
+        std::cout << "Shared Transaction ID: " << sh->getTranId()
+                  << ", Amount: " << sh->getAmount()
+                  << ", Category: " << printCategory(sh->getCategory()) << '\n';
+        sh->printParticipants();
+    }
+    std::cout << "----------------------\n";
+}

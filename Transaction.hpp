@@ -20,7 +20,7 @@ class Transaction {
 private:
     int id;
     double amount;
-    Categories category;  // Use enum class directly
+    Categories category;  
     TransactionType type;
     Date date;
 

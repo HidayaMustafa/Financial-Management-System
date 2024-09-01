@@ -7,8 +7,14 @@ int main() {
     User user1("Hidaya Mustafa", 1);
     cout << "---> User: " << user1.getName() << ", ID: " << user1.getId() << "\n";
    
+     User user2("Ahmad",2);
+    user2.addTransaction(2,TransactionType::DEPOSIT ,Categories::NONE, 200.0);
+    User user3("Raneem",3);
+    User user4("Saja",4);
+
     user1.setBudget(Categories::FOOD, 300);
     user1.setBudget(Categories::SHOES, 300);
+    user2.setBudget(Categories::FOOD, 300);
     
     user1.addTransaction(0, TransactionType::DEPOSIT ,Categories::NONE, 300.0);
     user1.addTransaction(1, TransactionType::WITHDRAW, Categories::FOOD, 200.0);
@@ -25,20 +31,30 @@ int main() {
 
     user1.deleteSavingPlan(0);
 
-    user1.addTransaction(2,TransactionType::DEPOSIT ,Categories::NONE, 200.0);
+    user1.addTransaction(2,TransactionType::DEPOSIT ,Categories::NONE, 500.0);
 
     user1.generateReport(Date(11, 8, 2024), Date(21, 8, 2024));
 
-    User user2("Ahmad",2);
 
-    SharedTransaction& sh1 = user1.createSharedTransaction(3,500,Categories::FOOD,150);
-    sh1.addParticipant(user2,100,150);
+    SharedTransaction sh(101, 500.0, Categories::FOOD, user1,250.0); 
+    sh.addParticipant(user2,400,150);
+    //sh.addParticipant(user3,100,150);
 
-    sh1.printParticipants();
+    sh.printParticipants();
+    sh.updateParticipantPaid(user1,200);
 
-    SharedTransaction& sh2 = user1.createSharedTransaction(4,500,Categories::FOOD,150);
+    //SharedTransaction sh2(102, 500.0, Categories::FOOD, user1, 250.0); 
+    //sh2.addParticipant(user4,100,150);
 
-    user1.printSh();
+    std::cout<<"//////////////////////////\n";
+    user2.printSharedTransaction();
+    user1.printSharedTransaction();
+
+    sh.exitParticipant(user1);
+
+    sh.printParticipants();
+    //sh2.printParticipants();
+    user1.printSharedTransaction();
 
     return 0;
 }

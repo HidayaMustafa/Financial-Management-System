@@ -1,3 +1,4 @@
 ./main
-.vscode
+.vscode/
 logFile.log
+Makefile
