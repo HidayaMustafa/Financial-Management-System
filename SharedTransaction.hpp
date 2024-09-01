@@ -20,5 +20,7 @@ public:
 
     void exitParticipant(const User& u);
 
-    void printParticipants()const;
+    void printParticipants() const;
+
+    Participant* getParticipant(const User& u);
 };

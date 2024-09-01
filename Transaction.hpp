@@ -26,7 +26,7 @@ private:
 
 public:
     Transaction(int Id, double num, Categories cat, TransactionType t);
-
+    virtual ~Transaction() = default;
     double getAmount() const;
     void setAmount(double amt);
 

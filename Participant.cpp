@@ -18,3 +18,6 @@ void Participant::updatePaidValue(double newValue){
 double Participant::getPaid()const {
     return paidValue;
 }
+double Participant::getRequired()const {
+    return requiredValue;
+}

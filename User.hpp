@@ -20,13 +20,11 @@ private:
     string name;
     vector<unique_ptr<SavingPlan>> plans;
     unordered_map<Categories, double> categoryBudgets;
-    vector<Transaction> transactions;
-    mutable vector<SharedTransaction*> sharedTransactions;
+    mutable vector<Transaction*> transactions;
 
 public:
     User(const string& Name, int Id);
     ~User();
-    const vector<Transaction>& getTransactions() const;
     const string& getName() const;
     int getId() const;
     void setId(int i);

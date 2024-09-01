@@ -63,11 +63,22 @@ void SharedTransaction::exitParticipant(const User& u) {
     }
 }
 
-void SharedTransaction::printParticipants() const {
-    std::cout << "Participants for SharedTransaction ID " << getTranId() << ":\n";
+void SharedTransaction::printParticipants() const{
+    std::cout << "-> Participants for SharedTransaction ID " << getTranId() << ":\n";
     for (const auto& participant : participants) {
-        std::cout << "User : " << participant->getUser().getName()
-                  << ", Paid: " << participant->getPaid() << '\n';
+        std::cout << "*- " << participant->getUser().getName()
+                  << " || Paid: " << participant->getPaid()
+                  << " || Required: " << participant->getRequired() << '\n';
     }
     std::cout << "----------------------\n";
 }
+
+Participant* SharedTransaction::getParticipant(const User& u) {
+    for (const auto& participant : participants) {
+        if (u.getId() == participant->getUser().getId()) {
+            return participant; 
+        }
+    }
+    return nullptr; 
+}
+

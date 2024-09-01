@@ -17,4 +17,6 @@ public:
     void updatePaidValue(double newValue);
 
     double getPaid()const;
+
+    double getRequired()const ;
 };

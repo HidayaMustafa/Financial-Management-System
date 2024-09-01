@@ -3,27 +3,24 @@
 #include <memory>
 #include <algorithm>
 
-
 using namespace std;
 
-
-User::User(const string& Name, int Id) : id(Id), name(Name)
+User::User(const string &Name, int Id) : id(Id), name(Name)
 {
-    //Logger::getInstance()->log(Info, name, " Program start.");
+    // Logger::getInstance()->log(Info, name, " Program start.");
 }
 
 User::~User()
 {
-    //Logger::getInstance()->log(Info, name, " Program End.");
+    // Logger::getInstance()->log(Info, name, " Program End.");
+    for (Transaction *t : transactions)
+    {
+        delete t;
+    }
+    transactions.clear();
 }
 
-const vector<Transaction>& User::getTransactions() const
-{
-    return transactions;
-}
-
-
-const string& User::getName()const
+const string &User::getName() const
 {
     return name;
 }
@@ -38,7 +35,7 @@ void User::setId(int i)
     id = i;
 }
 
-void User::setSavingPlan(int id, double target, const Date& startDate, const Date& endDate)
+void User::setSavingPlan(int id, double target, const Date &startDate, const Date &endDate)
 {
     plans.push_back(make_unique<SavingPlan>(id, target, startDate, endDate, name));
 }
@@ -52,7 +49,7 @@ SavingPlan *User::getSavingPlan(int id)
             return plan.get();
         }
     }
-    //Logger::getInstance()->log(Error, name, "Saving plan %d not found.", id);
+    // Logger::getInstance()->log(Error, name, "Saving plan %d not found.", id);
     return nullptr;
 }
 
@@ -64,16 +61,16 @@ void User::deleteSavingPlan(int Id)
     if (it != plans.end())
     {
         addTransaction(Id, TransactionType::DEPOSIT, Categories::NONE, (*it)->getSavingAmount());
-        //Logger::getInstance()->log(Info, name, " Saving plan %d deleted successfully.", Id);
+        // Logger::getInstance()->log(Info, name, " Saving plan %d deleted successfully.", Id);
         plans.erase(it);
     }
     else
     {
-        //Logger::getInstance()->log(Error, name, " Saving plan %d not found.", Id);
+        // Logger::getInstance()->log(Error, name, " Saving plan %d not found.", Id);
     }
 }
 
-void User::updateSavingPlan(int Id, double newTarget, const Date& newStartDate, const Date& newEndDate)
+void User::updateSavingPlan(int Id, double newTarget, const Date &newStartDate, const Date &newEndDate)
 {
     auto plan = getSavingPlan(Id);
     if (plan)
@@ -81,11 +78,11 @@ void User::updateSavingPlan(int Id, double newTarget, const Date& newStartDate, 
         plan->setTarget(newTarget);
         plan->setStartDate(newStartDate);
         plan->setEndDate(newEndDate);
-        //Logger::getInstance()->log(Info, name, " Saving plan %d updated successfully.", Id);
+        // Logger::getInstance()->log(Info, name, " Saving plan %d updated successfully.", Id);
     }
     else
     {
-        //Logger::getInstance()->log(Error, name, "Saving plan %d not found.", Id);
+        // Logger::getInstance()->log(Error, name, "Saving plan %d not found.", Id);
     }
 }
 
@@ -94,15 +91,15 @@ void User::setBudget(Categories category, double budget)
     if (categoryBudgets[category] < budget)
     {
         categoryBudgets[category] = budget;
-        //Logger::getInstance()->log(Info, name, " Budget for %s set to %.2f $.", printCategory(category), budget);
+        // Logger::getInstance()->log(Info, name, " Budget for %s set to %.2f $.", printCategory(category), budget);
     }
     else
     {
-        //Logger::getInstance()->log(Error, name, " Can't set budget for %s to a smaller value.", printCategory(category));
+        // Logger::getInstance()->log(Error, name, " Can't set budget for %s to a smaller value.", printCategory(category));
     }
 }
 
-const char *User::printCategory(Categories category)const
+const char *User::printCategory(Categories category) const
 {
     switch (category)
     {
@@ -121,18 +118,17 @@ const char *User::printCategory(Categories category)const
     }
 }
 
-
 void User::updateTransaction(int transId, TransactionType type, Categories category, double value)
 {
     for (auto &transaction : transactions)
     {
-        if (transaction.getTranId() != transId)
+        if (transaction->getTranId() != transId)
         {
             continue;
         }
 
-        TransactionType currentType = transaction.getTransactionType();
-        double currentAmount = transaction.getAmount();
+        TransactionType currentType = transaction->getTransactionType();
+        double currentAmount = transaction->getAmount();
 
         if (currentType == type)
         {
@@ -140,10 +136,10 @@ void User::updateTransaction(int transId, TransactionType type, Categories categ
             {
                 if (currentAmount != value)
                 {
-                    transaction.setAmount(value);
-                    transaction.setCategory(Categories::NONE);
-                    transaction.updateDate();
-                    //Logger::getInstance()->log(Info, name, " Transaction ID %d -- updated deposit to %.2f $ --> deposited successfully.", transId, value);
+                    transaction->setAmount(value);
+                    transaction->setCategory(Categories::NONE);
+                    transaction->updateDate();
+                    // Logger::getInstance()->log(Info, name, " Transaction ID %d -- updated deposit to %.2f $ --> deposited successfully.", transId, value);
                 }
             }
             else
@@ -151,14 +147,14 @@ void User::updateTransaction(int transId, TransactionType type, Categories categ
                 double amountDifference = value - currentAmount;
                 if (amountDifference < 0 || checkBudget(category, amountDifference))
                 {
-                    transaction.setAmount(value);
-                    transaction.setCategory(category);
-                    transaction.updateDate();
-                    //Logger::getInstance()->log(Info, name, " Transaction ID %d -- updated withdrawal to %.2f $ --> withdrawn successfully from %s.", transId, value, printCategory(category));
+                    transaction->setAmount(value);
+                    transaction->setCategory(category);
+                    transaction->updateDate();
+                    // Logger::getInstance()->log(Info, name, " Transaction ID %d -- updated withdrawal to %.2f $ --> withdrawn successfully from %s.", transId, value, printCategory(category));
                 }
                 else
                 {
-                    //Logger::getInstance()->log(Error, name, "Transaction ID %d -- failed to update.", transId);
+                    // Logger::getInstance()->log(Error, name, "Transaction ID %d -- failed to update.", transId);
                 }
             }
         }
@@ -168,58 +164,59 @@ void User::updateTransaction(int transId, TransactionType type, Categories categ
             {
                 if (currentType == TransactionType::WITHDRAW)
                 {
-                    transaction.setTransactionType(TransactionType::DEPOSIT);
-                    transaction.setAmount(value);
-                    transaction.setCategory(Categories::MISCELLANEOUS);
-                    transaction.updateDate();
-                    //Logger::getInstance()->log(Info, name, " Transaction ID %d -- updated withdrawal to deposit %.2f $ successfully.", transId, value);
+                    transaction->setTransactionType(TransactionType::DEPOSIT);
+                    transaction->setAmount(value);
+                    transaction->setCategory(Categories::MISCELLANEOUS);
+                    transaction->updateDate();
+                    // Logger::getInstance()->log(Info, name, " Transaction ID %d -- updated withdrawal to deposit %.2f $ successfully.", transId, value);
                 }
             }
             else
             {
-                if (checkBudget(category, value) && value < calculateTotal() - transaction.getAmount())
+                if (checkBudget(category, value) && value < calculateTotal() - transaction->getAmount())
                 {
-                    transaction.setAmount(value);
-                    transaction.setTransactionType(TransactionType::WITHDRAW);
-                    transaction.setCategory(category);
-                    transaction.updateDate();
+                    transaction->setAmount(value);
+                    transaction->setTransactionType(TransactionType::WITHDRAW);
+                    transaction->setCategory(category);
+                    transaction->updateDate();
                     if (isWarnBudget(category))
                     {
-                        //Logger::getInstance()->log(Warn, name, " The budget in %s has decreased to below 80%% of its previous amount.", printCategory(category));
+                        // Logger::getInstance()->log(Warn, name, " The budget in %s has decreased to below 80%% of its previous amount.", printCategory(category));
                     }
-                    //Logger::getInstance()->log(Info, name, " Transaction ID %d -- updated deposit to withdrawal %.2f $ successfully from %s.", transId, value, printCategory(category));
+                    // Logger::getInstance()->log(Info, name, " Transaction ID %d -- updated deposit to withdrawal %.2f $ successfully from %s.", transId, value, printCategory(category));
                 }
                 else
                 {
-                    //Logger::getInstance()->log(Error, name, "Transaction ID %d -- failed to update deposit to withdrawal.", transId);
+                    // Logger::getInstance()->log(Error, name, "Transaction ID %d -- failed to update deposit to withdrawal.", transId);
                 }
             }
         }
         return;
     }
-    //Logger::getInstance()->log(Error, name, "Transaction ID %d not found, can't update.", transId);
+    // Logger::getInstance()->log(Error, name, "Transaction ID %d not found, can't update.", transId);
 }
 
 void User::deleteTransaction(int transId)
 {
     for (auto i = transactions.begin(); i != transactions.end(); ++i)
     {
-        if (i->getTranId() == transId)
+        if ((*i)->getTranId() == transId)
         {
-            if (i->getTransactionType() == TransactionType::DEPOSIT)
+            if ((*i)->getTransactionType() == TransactionType::DEPOSIT)
             {
-                if (calculateTotal() - i->getAmount() < 0)
+                if (calculateTotal() - (*i)->getAmount() < 0)
                 {
-                    //Logger::getInstance()->log(Error, name, "Transaction ID %d can't be deleted, would result in negative balance.", transId);
+                    // Logger::getInstance()->log(Error, name, "Transaction ID %d can't be deleted, would result in negative balance.", transId);
                     return;
                 }
             }
-            //Logger::getInstance()->log(Info, name, " Transaction ID %d deleted successfully.", transId);
+            // Logger::getInstance()->log(Info, name, " Transaction ID %d deleted successfully.", transId);
+            delete *i;
             transactions.erase(i);
             return;
         }
     }
-    //Logger::getInstance()->log(Error, name, "Transaction ID %d not found, can't delete.", transId);
+    // Logger::getInstance()->log(Error, name, "Transaction ID %d not found, can't delete.", transId);
 }
 
 void User::addTransaction(int transId, TransactionType type, Categories category, double value)
@@ -236,11 +233,11 @@ void User::addTransaction(int transId, TransactionType type, Categories category
 
 void User::deposit(int transId, double value, Categories category)
 {
-    transactions.push_back(Transaction(transId, value, category, TransactionType::DEPOSIT));
-    //Logger::getInstance()->log(Info, name, " Transaction ID %d -- %.2f $ deposited successfully.", transId, value);
+    transactions.push_back(new Transaction(transId, value, category, TransactionType::DEPOSIT));
+    // Logger::getInstance()->log(Info, name, " Transaction ID %d -- %.2f $ deposited successfully.", transId, value);
 }
 
-bool User::isWarnBudget(Categories category)const
+bool User::isWarnBudget(Categories category) const
 {
     return 0.8 * categoryBudgets.at(category) < calculateExponses(category);
 }
@@ -249,114 +246,146 @@ void User::withdraw(int transId, double value, Categories category)
 {
     if (!checkBudget(category, value))
     {
-        //Logger::getInstance()->log(Error, name, "Withdraw of %.2f $ failed from %s. Exceeds budget.", value, printCategory(category));
+        // Logger::getInstance()->log(Error, name, "Withdraw of %.2f $ failed from %s. Exceeds budget.", value, printCategory(category));
         return;
     }
     if (calculateTotal() >= value)
     {
-        transactions.push_back(Transaction(transId, value, category, TransactionType::WITHDRAW));
-        //Logger::getInstance()->log(Info, name, " Transaction ID %d -- %.2f $ withdrawn successfully from %s.", transId, value, printCategory(category));
+        transactions.push_back(new Transaction(transId, value, category, TransactionType::WITHDRAW));
+        // Logger::getInstance()->log(Info, name, " Transaction ID %d -- %.2f $ withdrawn successfully from %s.", transId, value, printCategory(category));
 
         if (isWarnBudget(category))
         {
-            //Logger::getInstance()->log(Warn, name, " The budget in %s has decreased to below 80%% of its previous amount.", printCategory(category));
+            // Logger::getInstance()->log(Warn, name, " The budget in %s has decreased to below 80%% of its previous amount.", printCategory(category));
         }
     }
     else
     {
-        //Logger::getInstance()->log(Error, name, "Withdraw of %.2f $ failed. Exceeds total balance.", value);
+        // Logger::getInstance()->log(Error, name, "Withdraw of %.2f $ failed. Exceeds total balance.", value);
     }
 }
 
-double User::calculateIncoms()const
+double User::calculateIncoms() const
 {
     double totalIncoms = 0.0;
     for (auto &transaction : transactions)
     {
-        if (transaction.getTransactionType() == TransactionType::DEPOSIT)
+        if (transaction->getTransactionType() == TransactionType::DEPOSIT)
         {
-            totalIncoms += transaction.getAmount();
+            totalIncoms += transaction->getAmount();
         }
     }
     return totalIncoms;
 }
 
-double User::calculateIncoms(const Date& d1, const Date& d2)const
+double User::calculateIncoms(const Date &d1, const Date &d2) const
 {
     double totalIncoms = 0.0;
     for (auto &transaction : transactions)
     {
-        if (transaction.getTransactionType() == TransactionType::DEPOSIT && transaction.getDate() >= d1 && transaction.getDate() <= d2)
+        if (transaction->getTransactionType() == TransactionType::DEPOSIT && transaction->getDate() >= d1 && transaction->getDate() <= d2)
         {
-            totalIncoms += transaction.getAmount();
+            totalIncoms += transaction->getAmount();
         }
     }
     return totalIncoms;
 }
 
-double User::calculateExponses()const
+double User::calculateExponses() const
 {
     double totalExponses = 0.0;
     for (auto &transaction : transactions)
     {
-        if (transaction.getTransactionType() == TransactionType::WITHDRAW)
+        if (transaction->getTransactionType() == TransactionType::WITHDRAW)
         {
-            totalExponses += transaction.getAmount();
+            SharedTransaction *sharedTransaction = dynamic_cast<SharedTransaction *>(transaction);
+            if (sharedTransaction)
+            {
+                totalExponses += sharedTransaction->getParticipant(*this)->getPaid();
+            }
+            else
+            {
+                totalExponses += transaction->getAmount();
+            }
         }
     }
     return totalExponses;
 }
 
-double User::calculateExponses(Categories category)const
+double User::calculateExponses(Categories category) const
 {
     double totalExponses = 0.0;
     for (auto &transaction : transactions)
     {
-        if (transaction.getTransactionType() == TransactionType::WITHDRAW && transaction.getCategory() == category)
+        if (transaction->getTransactionType() == TransactionType::WITHDRAW && transaction->getCategory() == category)
         {
-            totalExponses += transaction.getAmount();
+           SharedTransaction *sharedTransaction = dynamic_cast<SharedTransaction *>(transaction);
+            if (sharedTransaction)
+            {
+                totalExponses += sharedTransaction->getParticipant(*this)->getPaid();
+            }
+            else
+            {
+                totalExponses += transaction->getAmount();
+            }
         }
     }
     return totalExponses;
 }
 
-double User::calculateExponses(const Date& d1, const Date& d2)const
+double User::calculateExponses(const Date &d1, const Date &d2) const
 {
     double totalExponses = 0.0;
     for (auto &transaction : transactions)
     {
-        if (transaction.getTransactionType() == TransactionType::WITHDRAW && transaction.getDate() >= d1 && transaction.getDate() <= d2)
+        if (transaction->getTransactionType() == TransactionType::WITHDRAW && transaction->getDate() >= d1 && transaction->getDate() <= d2)
         {
-            totalExponses += transaction.getAmount();
+            SharedTransaction *sharedTransaction = dynamic_cast<SharedTransaction *>(transaction);
+            if (sharedTransaction)
+            {
+                totalExponses += sharedTransaction->getParticipant(*this)->getPaid();
+            }
+            else
+            {
+                totalExponses += transaction->getAmount();
+            }
         }
     }
     return totalExponses;
 }
 
-double User::calculateExponses(const Date& d1, const Date& d2, Categories category)const
+double User::calculateExponses(const Date &d1, const Date &d2, Categories category) const
 {
     double totalExponses = 0.0;
     for (auto &transaction : transactions)
     {
-        if (transaction.getTransactionType() == TransactionType::WITHDRAW && transaction.getCategory() == category && transaction.getDate() >= d1 && transaction.getDate() <= d2)
+        if (transaction->getTransactionType() == TransactionType::WITHDRAW && transaction->getCategory() == category && transaction->getDate() >= d1 && transaction->getDate() <= d2)
         {
-            totalExponses += transaction.getAmount();
+            SharedTransaction *sharedTransaction = dynamic_cast<SharedTransaction *>(transaction);
+            if (sharedTransaction)
+            {
+                totalExponses += sharedTransaction->getParticipant(*this)->getPaid();
+            }
+            else
+            {
+                totalExponses += transaction->getAmount();
+            }
         }
     }
     return totalExponses;
 }
 
-double User::calculateTotal()const
+double User::calculateTotal() const
 {
     return calculateIncoms() - calculateExponses();
 }
 
-bool User::checkBudget(Categories category, double value)const
+bool User::checkBudget(Categories category, double value) const
 {
     return categoryBudgets.at(category) >= calculateExponses(category) + value;
 }
 
-void User::generateReport(const Date& d1, const Date& d2)const
+void User::generateReport(const Date &d1, const Date &d2) const
 {
     double totalIncoms = calculateIncoms(d1, d2);
     double totalExponses = calculateExponses(d1, d2);
@@ -386,31 +415,37 @@ void User::generateReport(const Date& d1, const Date& d2)const
     }
 }
 
-void User::joinSharedTransaction(SharedTransaction& sh)const{
-    for (const auto& transaction : sharedTransactions) {
-        if (transaction->getTranId() == sh.getTranId()) {
-            return; 
+void User::joinSharedTransaction(SharedTransaction &sh) const
+{
+    for (const auto &transaction : transactions)
+    {
+        if (transaction->getTranId() == sh.getTranId())
+        {
+            return;
         }
     }
-    sharedTransactions.push_back(&sh);
+    transactions.push_back(&sh);
 }
 
-void User::deleteSharedTransaction(SharedTransaction& transaction) {
-    // Remove the transaction from the vector of pointers
-    auto it = std::remove(sharedTransactions.begin(), sharedTransactions.end(), &transaction);
-    sharedTransactions.erase(it, sharedTransactions.end());
+void User::deleteSharedTransaction(SharedTransaction &transaction)
+{
+    auto it = std::remove(transactions.begin(), transactions.end(), &transaction);
+    transactions.erase(it, transactions.end());
 }
 
-
-
-
-void User::printSharedTransaction() const {
+void User::printSharedTransaction() const
+{
     std::cout << "Shared Transactions for User " << name << " (ID: " << id << "):\n";
-    for (const auto& sh : sharedTransactions) {
-        std::cout << "Shared Transaction ID: " << sh->getTranId()
-                  << ", Amount: " << sh->getAmount()
-                  << ", Category: " << printCategory(sh->getCategory()) << '\n';
-        sh->printParticipants();
+    for (const auto &t : transactions)
+    {
+        SharedTransaction *sh = dynamic_cast<SharedTransaction *>(t);
+        if (sh)
+        {
+            std::cout << "\nShared Transaction ID: " << sh->getTranId()
+                      << ", Amount: " << sh->getAmount()
+                      << ", Category: " << printCategory(sh->getCategory()) << '\n';
+            sh->printParticipants();
+        }
     }
-    std::cout << "----------------------\n";
+    std::cout << "______________________\n\n";
 }
