@@ -23,12 +23,15 @@ private:
     Categories category;  
     TransactionType type;
     Date date;
+    bool isShared;
 
 public:
     Transaction(int Id, double num, Categories cat, TransactionType t);
     virtual ~Transaction() = default;
     double getAmount() const;
     void setAmount(double amt);
+    void setIsShared(bool sh);
+    bool getIsShared();
 
     int getTranId() const;
 

@@ -9,6 +9,7 @@
 #include "Transaction.hpp"
 #include "SharedTransaction.hpp" 
 #include "SavingPlan.hpp"
+#include "Logger.hpp"
 
 using namespace std;
 

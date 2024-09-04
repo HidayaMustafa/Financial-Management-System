@@ -2,20 +2,22 @@
 #include "SharedTransaction.hpp"
 #include <memory>
 #include <algorithm>
+#include "Logger.hpp"
 
 using namespace std;
 
 User::User(const string &Name, int Id) : id(Id), name(Name)
 {
-    // Logger::getInstance()->log(Info, name, " Program start.");
+    Logger::getInstance()->log(Info, name, " Program start.");
 }
 
 User::~User()
 {
-    // Logger::getInstance()->log(Info, name, " Program End.");
-    for (Transaction *t : transactions)
-    {
-        delete t;
+    Logger::getInstance()->log(Info, name, " Program End.");
+    for (Transaction *t : transactions) {
+        if (t != nullptr && !t->getIsShared()) {  
+           delete t;
+        }
     }
     transactions.clear();
 }
@@ -49,7 +51,7 @@ SavingPlan *User::getSavingPlan(int id)
             return plan.get();
         }
     }
-    // Logger::getInstance()->log(Error, name, "Saving plan %d not found.", id);
+    Logger::getInstance()->log(Error, name, "Saving plan %d not found.", id);
     return nullptr;
 }
 
@@ -61,12 +63,12 @@ void User::deleteSavingPlan(int Id)
     if (it != plans.end())
     {
         addTransaction(Id, TransactionType::DEPOSIT, Categories::NONE, (*it)->getSavingAmount());
-        // Logger::getInstance()->log(Info, name, " Saving plan %d deleted successfully.", Id);
+        Logger::getInstance()->log(Info, name, " Saving plan %d deleted successfully.", Id);
         plans.erase(it);
     }
     else
     {
-        // Logger::getInstance()->log(Error, name, " Saving plan %d not found.", Id);
+        Logger::getInstance()->log(Error, name, " Saving plan %d not found.", Id);
     }
 }
 
@@ -78,11 +80,11 @@ void User::updateSavingPlan(int Id, double newTarget, const Date &newStartDate, 
         plan->setTarget(newTarget);
         plan->setStartDate(newStartDate);
         plan->setEndDate(newEndDate);
-        // Logger::getInstance()->log(Info, name, " Saving plan %d updated successfully.", Id);
+        Logger::getInstance()->log(Info, name, " Saving plan %d updated successfully.", Id);
     }
     else
     {
-        // Logger::getInstance()->log(Error, name, "Saving plan %d not found.", Id);
+        Logger::getInstance()->log(Error, name, "Saving plan %d not found.", Id);
     }
 }
 
@@ -91,11 +93,11 @@ void User::setBudget(Categories category, double budget)
     if (categoryBudgets[category] < budget)
     {
         categoryBudgets[category] = budget;
-        // Logger::getInstance()->log(Info, name, " Budget for %s set to %.2f $.", printCategory(category), budget);
+        Logger::getInstance()->log(Info, name, " Budget for %s set to %.2f $.", printCategory(category), budget);
     }
     else
     {
-        // Logger::getInstance()->log(Error, name, " Can't set budget for %s to a smaller value.", printCategory(category));
+        Logger::getInstance()->log(Error, name, " Can't set budget for %s to a smaller value.", printCategory(category));
     }
 }
 
@@ -139,7 +141,7 @@ void User::updateTransaction(int transId, TransactionType type, Categories categ
                     transaction->setAmount(value);
                     transaction->setCategory(Categories::NONE);
                     transaction->updateDate();
-                    // Logger::getInstance()->log(Info, name, " Transaction ID %d -- updated deposit to %.2f $ --> deposited successfully.", transId, value);
+                    Logger::getInstance()->log(Info, name, " Transaction ID %d -- updated deposit to %.2f $ --> deposited successfully.", transId, value);
                 }
             }
             else
@@ -150,11 +152,11 @@ void User::updateTransaction(int transId, TransactionType type, Categories categ
                     transaction->setAmount(value);
                     transaction->setCategory(category);
                     transaction->updateDate();
-                    // Logger::getInstance()->log(Info, name, " Transaction ID %d -- updated withdrawal to %.2f $ --> withdrawn successfully from %s.", transId, value, printCategory(category));
+                    Logger::getInstance()->log(Info, name, " Transaction ID %d -- updated withdrawal to %.2f $ --> withdrawn successfully from %s.", transId, value, printCategory(category));
                 }
                 else
                 {
-                    // Logger::getInstance()->log(Error, name, "Transaction ID %d -- failed to update.", transId);
+                    Logger::getInstance()->log(Error, name, "Transaction ID %d -- failed to update.", transId);
                 }
             }
         }
@@ -168,11 +170,10 @@ void User::updateTransaction(int transId, TransactionType type, Categories categ
                     transaction->setAmount(value);
                     transaction->setCategory(Categories::MISCELLANEOUS);
                     transaction->updateDate();
-                    // Logger::getInstance()->log(Info, name, " Transaction ID %d -- updated withdrawal to deposit %.2f $ successfully.", transId, value);
+                    Logger::getInstance()->log(Info, name, " Transaction ID %d -- updated withdrawal to deposit %.2f $ successfully.", transId, value);
                 }
             }
-            else
-            {
+            else{
                 if (checkBudget(category, value) && value < calculateTotal() - transaction->getAmount())
                 {
                     transaction->setAmount(value);
@@ -181,19 +182,19 @@ void User::updateTransaction(int transId, TransactionType type, Categories categ
                     transaction->updateDate();
                     if (isWarnBudget(category))
                     {
-                        // Logger::getInstance()->log(Warn, name, " The budget in %s has decreased to below 80%% of its previous amount.", printCategory(category));
+                        Logger::getInstance()->log(Warn, name, " The budget in %s has decreased to below 80%% of its previous amount.", printCategory(category));
                     }
-                    // Logger::getInstance()->log(Info, name, " Transaction ID %d -- updated deposit to withdrawal %.2f $ successfully from %s.", transId, value, printCategory(category));
+                    Logger::getInstance()->log(Info, name, " Transaction ID %d -- updated deposit to withdrawal %.2f $ successfully from %s.", transId, value, printCategory(category));
                 }
                 else
                 {
-                    // Logger::getInstance()->log(Error, name, "Transaction ID %d -- failed to update deposit to withdrawal.", transId);
+                    Logger::getInstance()->log(Error, name, "Transaction ID %d -- failed to update deposit to withdrawal.", transId);
                 }
             }
         }
         return;
     }
-    // Logger::getInstance()->log(Error, name, "Transaction ID %d not found, can't update.", transId);
+    Logger::getInstance()->log(Error, name, "Transaction ID %d not found, can't update.", transId);
 }
 
 void User::deleteTransaction(int transId)
@@ -206,17 +207,17 @@ void User::deleteTransaction(int transId)
             {
                 if (calculateTotal() - (*i)->getAmount() < 0)
                 {
-                    // Logger::getInstance()->log(Error, name, "Transaction ID %d can't be deleted, would result in negative balance.", transId);
+                    Logger::getInstance()->log(Error, name, "Transaction ID %d can't be deleted, would result in negative balance.", transId);
                     return;
                 }
             }
-            // Logger::getInstance()->log(Info, name, " Transaction ID %d deleted successfully.", transId);
-            delete *i;
+            Logger::getInstance()->log(Info, name, " Transaction ID %d deleted successfully.", transId);
+            delete (*i);
             transactions.erase(i);
             return;
         }
     }
-    // Logger::getInstance()->log(Error, name, "Transaction ID %d not found, can't delete.", transId);
+    Logger::getInstance()->log(Error, name, "Transaction ID %d not found, can't delete.", transId);
 }
 
 void User::addTransaction(int transId, TransactionType type, Categories category, double value)
@@ -234,7 +235,7 @@ void User::addTransaction(int transId, TransactionType type, Categories category
 void User::deposit(int transId, double value, Categories category)
 {
     transactions.push_back(new Transaction(transId, value, category, TransactionType::DEPOSIT));
-    // Logger::getInstance()->log(Info, name, " Transaction ID %d -- %.2f $ deposited successfully.", transId, value);
+    Logger::getInstance()->log(Info, name, " Transaction ID %d -- %.2f $ deposited successfully.", transId, value);
 }
 
 bool User::isWarnBudget(Categories category) const
@@ -246,22 +247,22 @@ void User::withdraw(int transId, double value, Categories category)
 {
     if (!checkBudget(category, value))
     {
-        // Logger::getInstance()->log(Error, name, "Withdraw of %.2f $ failed from %s. Exceeds budget.", value, printCategory(category));
+        Logger::getInstance()->log(Error, name, "Withdraw of %.2f $ failed from %s. Exceeds budget.", value, printCategory(category));
         return;
     }
     if (calculateTotal() >= value)
     {
         transactions.push_back(new Transaction(transId, value, category, TransactionType::WITHDRAW));
-        // Logger::getInstance()->log(Info, name, " Transaction ID %d -- %.2f $ withdrawn successfully from %s.", transId, value, printCategory(category));
+        Logger::getInstance()->log(Info, name, " Transaction ID %d -- %.2f $ withdrawn successfully from %s.", transId, value, printCategory(category));
 
         if (isWarnBudget(category))
         {
-            // Logger::getInstance()->log(Warn, name, " The budget in %s has decreased to below 80%% of its previous amount.", printCategory(category));
+            Logger::getInstance()->log(Warn, name, " The budget in %s has decreased to below 80%% of its previous amount.", printCategory(category));
         }
     }
     else
     {
-        // Logger::getInstance()->log(Error, name, "Withdraw of %.2f $ failed. Exceeds total balance.", value);
+        Logger::getInstance()->log(Error, name, "Withdraw of %.2f $ failed. Exceeds total balance.", value);
     }
 }
 
@@ -417,19 +418,24 @@ void User::generateReport(const Date &d1, const Date &d2) const
 
 void User::joinSharedTransaction(SharedTransaction &sh) const
 {
+    Logger::getInstance()->log(Info, this->getName(), "Attempting to join Shared Transaction ID: %d", sh.getTranId());
+
     for (const auto &transaction : transactions)
     {
         if (transaction->getTranId() == sh.getTranId())
         {
+            Logger::getInstance()->log(Warn, this->getName(), "User %s is already part of Shared Transaction ID: %d", this->getName(), sh.getTranId());
             return;
         }
     }
     transactions.push_back(&sh);
+    Logger::getInstance()->log(Info, this->getName(), "User %s successfully joined Shared Transaction ID: %d", this->getName(), sh.getTranId());
 }
 
 void User::deleteSharedTransaction(SharedTransaction &transaction)
 {
     auto it = std::remove(transactions.begin(), transactions.end(), &transaction);
+    Logger::getInstance()->log(Info, this->getName(), "Shared Transaction ID: %d successfully removed for User %s", transaction.getTranId(), this->getName());
     transactions.erase(it, transactions.end());
 }
 

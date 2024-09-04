@@ -3,7 +3,7 @@
 #include <iostream>
 #include <string>
 #include "Date.hpp"  
-// #include "Logger.hpp"
+#include "Logger.hpp"
 
 class SavingPlan {
 private:
