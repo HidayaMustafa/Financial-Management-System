@@ -7,16 +7,16 @@ int main() {
     User user1("Hidaya Mustafa", 1);
     //cout << "---> User: " << user1.getName() << ", ID: " << user1.getId() << "\n";
       
-    User user2("Ahmad",2);
-    user2.addTransaction(7,TransactionType::DEPOSIT ,Categories::NONE, 200.0);
+    // User user2("Ahmad",2);
+    // user2.addTransaction(7,TransactionType::DEPOSIT ,Categories::NONE, 200.0);
     
-    User user3("Abrar",3);
-    user3.addTransaction(8,TransactionType::DEPOSIT ,Categories::NONE, 200.0);
+    // User user3("Abrar",3);
+    // user3.addTransaction(8,TransactionType::DEPOSIT ,Categories::NONE, 200.0);
     
     user1.setBudget(Categories::FOOD, 300);
     user1.setBudget(Categories::SHOES, 300);
-    user2.setBudget(Categories::FOOD, 300);
-    user3.setBudget(Categories::FOOD, 300);
+    // user2.setBudget(Categories::FOOD, 300);
+    // user3.setBudget(Categories::FOOD, 300);
     
     user1.addTransaction(0, TransactionType::DEPOSIT ,Categories::NONE, 300.0);
     //user1.addTransaction(1, TransactionType::WITHDRAW, Categories::FOOD, 200.0);
@@ -24,21 +24,23 @@ int main() {
     cout << "---> User: " << user1.getName() << ", ID: " << user1.getId() << "\n";
     user1.generateReport(Date(11, 8, 2024), Date(3, 9, 2024));
 
-    SharedTransaction sh(101, 300.0, Categories::FOOD, user1); 
-
-    sh.printParticipants();
-    sh.addParticipant(user2,150);
+    SharedTransaction *sh = new SharedTransaction(101, 300.0, Categories::FOOD, user1); 
+    // sh.printParticipants();
+    // sh->addParticipant(user2,150);
     cout <<"\n\n";
-    sh.printParticipants();
-    cout <<"\n\n";
-    cout << "---> User: " << user1.getName() << ", ID: " << user1.getId() << "\n";
-    user1.generateReport(Date(11, 8, 2024), Date(3, 9, 2024));
-    sh.addParticipant(user3,50);
-    cout <<"\n\n";
-    sh.printParticipants();
+    // sh.printParticipants();
     cout <<"\n\n";
     cout << "---> User: " << user1.getName() << ", ID: " << user1.getId() << "\n";
     user1.generateReport(Date(11, 8, 2024), Date(3, 9, 2024));
+    // sh.addParticipant(user3,50);
+    cout <<"\n\n";
+    // sh.printParticipants();
+    cout <<"\n\n";
+    cout << "---> User: " << user1.getName() << ", ID: " << user1.getId() << "\n";
+    user1.generateReport(Date(11, 8, 2024), Date(3, 9, 2024));
+    // user1.printSharedTransaction();
+    // user2.printSharedTransaction();
+    // user3.printSharedTransaction();
 /*
     sh.updateParticipantPaid(user1,100);
 

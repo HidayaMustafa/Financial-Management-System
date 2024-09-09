@@ -14,11 +14,23 @@ User::User(const string &Name, int Id) : id(Id), name(Name)
 User::~User()
 {
     Logger::getInstance()->log(Info, name, " Program End.");
-    for (Transaction *t : transactions) {
-        if (t != nullptr && !t->getIsShared()) {  
-           delete t;
+    plans.clear();
+    
+    for (auto *t : transactions) {
+        if (t == nullptr) {
+            continue; 
+        }
+        if (t->getIsShared() == 0) { 
+            delete t; 
+        } else if (t->getIsShared() == 1) {
+            auto *sharedTransaction = static_cast<SharedTransaction *>(t);
+                sharedTransaction->removeParticipant(*this);
+                if (sharedTransaction->getParticipants().empty()) {
+                    delete sharedTransaction;
+                }
         }
     }
+
     transactions.clear();
 }
 
@@ -416,26 +428,24 @@ void User::generateReport(const Date &d1, const Date &d2) const
     }
 }
 
-void User::joinSharedTransaction(SharedTransaction &sh) const
+void User::joinSharedTransaction(SharedTransaction *sh) const
 {
-    Logger::getInstance()->log(Info, this->getName(), "Attempting to join Shared Transaction ID: %d", sh.getTranId());
-
     for (const auto &transaction : transactions)
     {
-        if (transaction->getTranId() == sh.getTranId())
+        if (transaction->getTranId() == sh->getTranId())
         {
-            Logger::getInstance()->log(Warn, this->getName(), "User %s is already part of Shared Transaction ID: %d", this->getName(), sh.getTranId());
+            Logger::getInstance()->log(Warn, this->getName(), "User %s is already part of Shared Transaction ID: %d", name.c_str(), sh->getTranId());
             return;
         }
     }
-    transactions.push_back(&sh);
-    Logger::getInstance()->log(Info, this->getName(), "User %s successfully joined Shared Transaction ID: %d", this->getName(), sh.getTranId());
+    transactions.push_back(sh);
+    Logger::getInstance()->log(Info, this->getName(), "User %s successfully joined Shared Transaction ID: %d.", name.c_str(), sh->getTranId());
 }
 
 void User::deleteSharedTransaction(SharedTransaction &transaction)
 {
     auto it = std::remove(transactions.begin(), transactions.end(), &transaction);
-    Logger::getInstance()->log(Info, this->getName(), "Shared Transaction ID: %d successfully removed for User %s", transaction.getTranId(), this->getName());
+    Logger::getInstance()->log(Info, this->getName(), "Shared Transaction ID: %d successfully removed for User %s", transaction.getTranId(), name.c_str());
     transactions.erase(it, transactions.end());
 }
 
@@ -447,6 +457,7 @@ void User::printSharedTransaction() const
         SharedTransaction *sh = dynamic_cast<SharedTransaction *>(t);
         if (sh)
         {
+            cout <<"ID:"<< sh->getTranId() << "-- Is Shared :" << sh->getIsShared() << "\n";
             std::cout << "\nShared Transaction ID: " << sh->getTranId()
                       << ", Amount: " << sh->getAmount()
                       << ", Category: " << printCategory(sh->getCategory()) << '\n';
@@ -454,4 +465,9 @@ void User::printSharedTransaction() const
         }
     }
     std::cout << "______________________\n\n";
+
+
+    for(auto it = transactions.begin(); it != transactions.end(); it++) {
+        cout <<name<<"ID:"<< (*it)->getTranId() << "-- Is Shared :" << (*it)->getIsShared() << "\n";
+    }
 }

@@ -1,8 +1,11 @@
 #include "Transaction.hpp"
 
 Transaction::Transaction(int Id, double num, Categories cat, TransactionType t)
-    : id(Id), amount(num), category(cat), type(t), date() ,isShared(false){}
+    : id(Id), amount(num), category(cat), type(t), date(){}
 
+Transaction::~Transaction(){
+    
+}
 double Transaction::getAmount() const {
     return amount;
 }
@@ -11,11 +14,8 @@ void Transaction::setAmount(double amt) {
     amount = amt;
 }
 
-void Transaction::setIsShared(bool sh){
-    isShared = sh;
-}
 bool Transaction::getIsShared(){
-    return isShared;
+    return false;
 }
 
 int Transaction::getTranId() const {

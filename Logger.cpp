@@ -4,7 +4,8 @@ Logger* Logger::instance = nullptr;
 mutex Logger::mutex_;
 
 Logger::Logger() {
-    logFile.open("logFile.log", ios::out | ios::app);
+    logFile.open("logFile.log", ios::out);
+    logFile.clear();
     if (!logFile.is_open()) {
         cerr << "Failed to open log file" << endl;
     }

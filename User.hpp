@@ -25,7 +25,7 @@ private:
 
 public:
     User(const string& Name, int Id);
-    ~User();
+    virtual ~User();
     const string& getName() const;
     int getId() const;
     void setId(int i);
@@ -50,7 +50,7 @@ public:
     double calculateTotal() const;
     bool checkBudget(Categories category, double value) const;
     void generateReport(const Date& d1, const Date& d2) const;
-    void joinSharedTransaction(SharedTransaction& sh)const ;
+    void joinSharedTransaction(SharedTransaction *sh)const ;
     void deleteSharedTransaction(SharedTransaction& transaction);
     void printSharedTransaction() const;
 };

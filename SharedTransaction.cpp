@@ -4,7 +4,6 @@
 SharedTransaction::SharedTransaction(int id, double amount, Categories category, const User &initialParticipant)
     : Transaction(id, amount, category, TransactionType::WITHDRAW)
 {
-    this->setIsShared(true);
     Logger::getInstance()->log(Info, initialParticipant.getName(),"Shared Transaction ID: %d created successfully", this->getTranId());
     addParticipant(initialParticipant, amount);
 }
@@ -16,13 +15,18 @@ SharedTransaction::~SharedTransaction(){
         }
     }
     participants.clear();
+ 
+}
+
+bool SharedTransaction::getIsShared(){
+    return true;
 }
 
 void SharedTransaction::addParticipant(const User &u, double paid)
 {
     for (const auto &participant : participants) {
         if (participant->getUser().getId() == u.getId()) {
-            Logger::getInstance()->log(Error, u.getName(), "%s is already in the Shared Transaction ID: %d.", u.getName(),this->getTranId());
+            Logger::getInstance()->log(Error, u.getName(), "%s is already in the Shared Transaction ID: %d.", u.getName().c_str(),this->getTranId());
             return;
         }
     }
@@ -36,7 +40,7 @@ void SharedTransaction::addParticipant(const User &u, double paid)
             Participant *participant = new Participant(u, paid,required);
             participants.push_back(participant);
             UpdateRequiredAmount(u.getName(),required);
-            u.joinSharedTransaction(*this);
+            u.joinSharedTransaction(this);
             int count=0;
             for (auto &participant : participants) {
                 if(participant->getPaid() > required){
@@ -49,7 +53,7 @@ void SharedTransaction::addParticipant(const User &u, double paid)
                     participant->setPaid(participant->getPaid()-p);
                 }
             }
-            Logger::getInstance()->log(Info, u.getName(), " %s Added successfully to Shared Transaction ID %d -- %.2f $ withdrawn successfully from %s.", u.getName(), this->getTranId(), paid, u.printCategory(this->getCategory()));
+            Logger::getInstance()->log(Info, u.getName(), " %s Added successfully to Shared Transaction ID %d -- %.2f $ withdrawn successfully from %s.", u.getName().c_str(), this->getTranId(), paid, u.printCategory(this->getCategory()));
             Logger::getInstance()->log(Info, u.getName(), " Updated Required amount to %.2f for SharedTransaction ID: %d.", required,this->getTranId());
             if (u.isWarnBudget(this->getCategory())) {
                 Logger::getInstance()->log(Warn, u.getName(), "The budget in %s has decreased to below 80%% of its previous amount.", u.printCategory(this->getCategory()));
