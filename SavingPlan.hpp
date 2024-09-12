@@ -4,6 +4,7 @@
 #include <string>
 #include "Date.hpp"  
 #include "Logger.hpp"
+#include "DataBaseManager.hpp"
 
 class SavingPlan {
 private:
@@ -15,15 +16,18 @@ private:
     std::string name;
 
 public:
-    SavingPlan(int Id, double newtarget, Date newStartDate, Date newEndDate, std::string Name);
+    SavingPlan(double newtarget, Date newStartDate, Date newEndDate, std::string Name);
 
     ~SavingPlan();
 
     int getId() const;
+    void setId(int ID);
     double getSavingAmount() const;
     void setStartDate(const Date& d1);
     void setEndDate(const Date& d1);
     void setTarget(double t);
-    void transferAmount(double amount);
     void checkSavingPlan() const;
+    double getTarget() const;
+    Date getStartDate() ;
+    Date getEndDate();
 };

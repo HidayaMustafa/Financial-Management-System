@@ -22,4 +22,5 @@ public:
     int operator-(const Date& d) const;
 
     void display() const;
+    string toString()const ;
 };

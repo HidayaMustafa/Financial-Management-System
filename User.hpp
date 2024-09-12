@@ -10,37 +10,37 @@
 #include "SharedTransaction.hpp" 
 #include "SavingPlan.hpp"
 #include "Logger.hpp"
+#include "DataBaseManager.hpp"
 
 using namespace std;
 
 class SharedTransaction;
+class SavingPlan;
 
 class User {
 private:
-    int id;
-    string name;
-    vector<unique_ptr<SavingPlan>> plans;
-    unordered_map<Categories, double> categoryBudgets;
-    mutable vector<Transaction*> transactions;
+    int userId;
+    string userName;
 
 public:
-    User(const string& Name, int Id);
+    User(const string& Name);
     virtual ~User();
-    const string& getName() const;
-    int getId() const;
-    void setId(int i);
-    void setSavingPlan(int id, double target, const Date& startDate, const Date& endDate);
-    SavingPlan* getSavingPlan(int id);
-    void deleteSavingPlan(int Id);
-    void updateSavingPlan(int Id, double newTarget, const Date& newStartDate, const Date& newEndDate);
-    void setBudget(Categories category, double budget);
-    const char* printCategory(Categories category) const;
+
+    const string& getUserName() const;
+    int getUserId() const;
+    void setUserId(int id);
+
+    void setSavingPlan(double target, const Date& startDate, const Date& endDate);
+    void deleteSavingPlan(int planId);
+    void updateSavingPlan(int planId, double newTarget, const Date& newStartDate, const Date& newEndDate);
+    void addSavingAmount(int planId , double newAmount);
+
     void updateTransaction(int transId, TransactionType type, Categories category, double value);
     void deleteTransaction(int transId);
-    void addTransaction(int transId, TransactionType type, Categories category, double value);
-    void deposit(int transId, double value, Categories category);
-    bool isWarnBudget(Categories category) const;
-    void withdraw(int transId, double value, Categories category);
+    void addTransaction(TransactionType type, Categories category, double value);
+    void deposit( double value, Categories category);
+    void withdraw(double value, Categories category);
+
     double calculateIncoms() const;
     double calculateIncoms(const Date& d1, const Date& d2) const;
     double calculateExponses() const;
@@ -48,9 +48,15 @@ public:
     double calculateExponses(const Date& d1, const Date& d2) const;
     double calculateExponses(const Date& d1, const Date& d2, Categories category) const;
     double calculateTotal() const;
+
+    void setBudget(Categories category, double budget);
+    bool isWarnBudget(Categories category) const;
+    const char* printCategory(Categories category) const;
     bool checkBudget(Categories category, double value) const;
+
+
     void generateReport(const Date& d1, const Date& d2) const;
+
+
     void joinSharedTransaction(SharedTransaction *sh)const ;
-    void deleteSharedTransaction(SharedTransaction& transaction);
-    void printSharedTransaction() const;
 };

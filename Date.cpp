@@ -49,3 +49,7 @@ void Date::display() const {
          << setw(2) << setfill('0') << month << '/'
          << year;
 }
+
+string Date::toString() const {
+    return to_string(day) + "/" + to_string(month) + "/" +to_string(year);
+}

@@ -1,16 +1,17 @@
 #include "SavingPlan.hpp"
 
-SavingPlan::SavingPlan(int Id, double newtarget, Date newStartDate, Date newEndDate, std::string Name)
-    : id(Id), savingAmount(0), target(newtarget), startDate(newStartDate), endDate(newEndDate), name(Name) {
-    Logger::getInstance()->log(Info, name, "Saving plan %d created.", id);
+SavingPlan::SavingPlan(double newtarget, Date newStartDate, Date newEndDate, std::string Name)
+    :savingAmount(0), target(newtarget), startDate(newStartDate), endDate(newEndDate), name(Name) {
 }
 
 SavingPlan::~SavingPlan() {
-    Logger::getInstance()->log(Info, name, "Saving plan %d deleted.", id);
 }
 
 int SavingPlan::getId() const {
     return id;
+}
+void SavingPlan::setId(int ID){
+    id= ID;
 }
 
 double SavingPlan::getSavingAmount() const {
@@ -25,13 +26,19 @@ void SavingPlan::setEndDate(const Date& d1) {
     endDate = d1;
 }
 
+Date SavingPlan::getStartDate() {
+    return startDate;
+}
+
+Date SavingPlan::getEndDate() {
+    return endDate ;
+}
+
 void SavingPlan::setTarget(double t) {
     target = t;
 }
-
-void SavingPlan::transferAmount(double amount) {
-    savingAmount += amount;
-    Logger::getInstance()->log(Info, name, "%.2f$ added successfully to saving plan %d.", amount, id);
+double SavingPlan::getTarget() const{
+    return target;
 }
 
 void SavingPlan::checkSavingPlan() const {

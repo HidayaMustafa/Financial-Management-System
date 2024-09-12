@@ -9,11 +9,11 @@ private:
     double paidValue;
     double requiredValue;
 public:
-    Participant(const User& u, double paid,double required);
+    Participant(const User& user, double paid,double required);
     const User& getUser() const;
     void updatePaidValue(double newValue);
     double getPaid()const;
     void setPaid(double value);
     double getRequired()const;
-    void setRequired(double value);
+    void setRequired(double newRequired);
 };

@@ -1,7 +1,7 @@
 #include "Participant.hpp"
 
-Participant::Participant(const User& u, double paid, double required)
-    : user(u), paidValue(paid), requiredValue(required) {}
+Participant::Participant(const User& user, double paid, double required)
+    : user(user), paidValue(paid), requiredValue(required) {}
 
 const User& Participant::getUser() const {
     return user;
@@ -21,6 +21,6 @@ void Participant::setPaid(double value){
 double Participant::getRequired()const {
     return requiredValue;
 }
-void Participant::setRequired(double value ) {
-    requiredValue = value;
+void Participant::setRequired(double newRequired ) {
+    requiredValue = newRequired;
 }

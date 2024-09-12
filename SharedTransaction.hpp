@@ -5,15 +5,15 @@
 #include "Participant.hpp"
 #include "User.hpp"
 #include "Logger.hpp"
+#include "DataBaseManager.hpp"
 
 class Participant;
 class User;
 
-class SharedTransaction : public Transaction {
-private:
-    std::vector<Participant*> participants;
+
+class SharedTransaction : public Transaction { 
 public:
-    SharedTransaction(int id, double amount, Categories category,const User& initialParticipant);
+    SharedTransaction(double amount, Categories category,const User& initialParticipant);
     virtual ~ SharedTransaction()override;
     void addParticipant(const User& u, double paid);
     double CalculateParticipantAmountRequired();
@@ -22,12 +22,5 @@ public:
     void updateParticipantPaid(const User& u, double newValue);
 
     void removeParticipant(User& u);
-
-    void printParticipants() const;
-
-    Participant* getParticipant(const User& u);
-    
-    std::vector <Participant*>getParticipants()const;
-
-    bool getIsShared() override;
+    void deleteSharedTransaction();
 };

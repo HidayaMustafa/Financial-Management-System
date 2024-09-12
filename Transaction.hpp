@@ -25,13 +25,13 @@ private:
     Date date;
 
 public:
-    Transaction(int Id, double num, Categories cat, TransactionType t);
+    Transaction(double num, Categories cat, TransactionType t);
     virtual ~Transaction();
     double getAmount() const;
     void setAmount(double amt);
-    virtual bool getIsShared();
-
+    
     int getTranId() const;
+    void setTranId(int ID) ;
 
     Categories getCategory() const;
     void setCategory(Categories cat);
@@ -41,4 +41,7 @@ public:
 
     TransactionType getTransactionType() const;
     void setTransactionType(TransactionType t);
+
+    const char *printCategory(Categories category) const;
+    const char *printType(TransactionType type) const;
 };
