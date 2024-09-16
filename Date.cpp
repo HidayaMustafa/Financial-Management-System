@@ -50,6 +50,6 @@ void Date::display() const {
          << year;
 }
 
-string Date::toString() const {
+string Date::toString()const {
     return to_string(day) + "/" + to_string(month) + "/" +to_string(year);
 }

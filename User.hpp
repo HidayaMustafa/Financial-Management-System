@@ -32,7 +32,7 @@ public:
 
     void setSavingPlan(double target, const Date& startDate, const Date& endDate);
     void deleteSavingPlan(int planId);
-    void updateSavingPlan(int planId, double newTarget, const Date& newStartDate, const Date& newEndDate);
+    void updateSavingPlan(int planId, double newTarget, Date& newStartDate, Date& newEndDate);
     void addSavingAmount(int planId , double newAmount);
 
     void updateTransaction(int transId, TransactionType type, Categories category, double value);
@@ -47,16 +47,12 @@ public:
     double calculateExponses(Categories category) const;
     double calculateExponses(const Date& d1, const Date& d2) const;
     double calculateExponses(const Date& d1, const Date& d2, Categories category) const;
-    double calculateTotal() const;
+    double calculateCurrentBalance() const;
 
     void setBudget(Categories category, double budget);
-    bool isWarnBudget(Categories category) const;
     const char* printCategory(Categories category) const;
-    bool checkBudget(Categories category, double value) const;
+    bool isBudgetExceeded(Categories category, double value)const;
 
 
     void generateReport(const Date& d1, const Date& d2) const;
-
-
-    void joinSharedTransaction(SharedTransaction *sh)const ;
 };

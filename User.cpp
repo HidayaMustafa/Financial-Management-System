@@ -40,7 +40,7 @@ void User::setSavingPlan(double target, const Date &startDate, const Date &endDa
 void User::deleteSavingPlan(int planId){
     DataBaseManager::getInstance().deleteSavingPlan(planId);
 }
-void User::updateSavingPlan(int planId, double newTarget, const Date &newStartDate, const Date &newEndDate){
+void User::updateSavingPlan(int planId, double newTarget,  Date &newStartDate,  Date &newEndDate){
     DataBaseManager::getInstance().updateSavingPlan(planId,newTarget, newStartDate, newEndDate);
 }
 void User::addSavingAmount(int planId , double newAmount){
@@ -49,9 +49,11 @@ void User::addSavingAmount(int planId , double newAmount){
 
 
 void User::updateTransaction(int transactionId, TransactionType type, Categories category, double value){
+    DataBaseManager::getInstance().updateTransaction(userId,transactionId, type, category, value);
 }
 void User::deleteTransaction(int transactionId){
-    Logger::getInstance()->log(Error, userName, "Transaction userId %d not found, can't delete.", transactionId);
+    DataBaseManager::getInstance().deleteTransaction(transactionId);
+    //Logger::getInstance()->log(Error, userName, "Transaction userId %d not found, can't delete.", transactionId);
 }
 void User::addTransaction(TransactionType type, Categories category, double value)
 {
@@ -69,15 +71,23 @@ void User::deposit(double value, Categories category){
     DataBaseManager::getInstance().insertTransaction(userId,newTransaction);
 }
 void User::withdraw(double value, Categories category){
+
+    if (isBudgetExceeded(category, value)){
+        return;
+    }
+    if (calculateCurrentBalance() >= value){
         Transaction newTransaction(value, category, TransactionType::WITHDRAW);
         DataBaseManager::getInstance().insertTransaction(userId,newTransaction);
+    }else{
+        Logger::getInstance()->log(Error, userName, "Withdraw of %.2f $ failed. Exceeds total balance.", value);
+    }
 }
+
 
 
 double User::calculateIncoms() const
 {
-    double totalIncoms = 0.0;
-    return totalIncoms;
+    return DataBaseManager::getInstance().calculateTotalIncoms(userId);
 }
 double User::calculateIncoms(const Date &d1, const Date &d2) const
 {
@@ -87,14 +97,11 @@ double User::calculateIncoms(const Date &d1, const Date &d2) const
 }
 double User::calculateExponses() const
 {
-    double totalExponses = 0.0;
-    return totalExponses;
+   return DataBaseManager::getInstance().calculateTotalExponses(userId);
 }
 double User::calculateExponses(Categories category) const
 {
-    double totalExponses = 0.0;
-    
-    return totalExponses;
+    return DataBaseManager::getInstance().calculateTotalExponses(userId,category);
 }
 double User::calculateExponses(const Date &d1, const Date &d2) const
 {
@@ -106,19 +113,15 @@ double User::calculateExponses(const Date &d1, const Date &d2, Categories catego
     double totalExponses = 0.0;
     return totalExponses;
 }
-double User::calculateTotal() const
+double User::calculateCurrentBalance() const
 {
     return calculateIncoms() - calculateExponses();
 }
 
 
-bool User::checkBudget(Categories category, double value) const
-{
-    return true;
-}
-bool User::isWarnBudget(Categories category) const
-{
-    return 0.0;
+
+bool User::isBudgetExceeded(Categories category, double amount)const {
+    DataBaseManager::getInstance().isBudgetExceeded(userId,category,amount);
 }
 void User::setBudget(Categories category, double budget)
 {
@@ -144,10 +147,26 @@ const char *User::printCategory(Categories category) const
 }
 
 
+
 void User::generateReport(const Date &d1, const Date &d2) const{ 
+    cout << "User : "<< userName <<"| "<<userId<<" Report from ";
+    d1.display();
+    cout<< " to "; 
+    d2.display();
+    cout << ":\n";
+    cout << "           ==================\n";
+
+    cout << "----> Transaction: \n";
+
+    DataBaseManager::getInstance().generateTransactionReport(d1, d2, userId);
+
+    cout << "\n***********************************************************\n\n";
+    cout << "----> Shared Transaction: \n";
+
+    DataBaseManager::getInstance().genarateSharedTransactionReport(d1, d2, userId);
+
+    cout << "\n***********************************************************\n\n";
+    cout << "----> Saving Plan: \n";
+    
+    DataBaseManager::getInstance().genarateSavingPlansReport(d1, d2, userId);
 }
-
-
-void User::joinSharedTransaction(SharedTransaction *sh) const{
-}
-

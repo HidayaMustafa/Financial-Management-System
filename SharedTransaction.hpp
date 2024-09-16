@@ -10,17 +10,16 @@
 class Participant;
 class User;
 
-
 class SharedTransaction : public Transaction { 
 public:
     SharedTransaction(double amount, Categories category,const User& initialParticipant);
     virtual ~ SharedTransaction()override;
-    void addParticipant(const User& u, double paid);
-    double CalculateParticipantAmountRequired();
-    void UpdateRequiredAmount(string name ,double required);
+    void addParticipant(const User& user, double paid);
+    double calculateParticipantAmountRequired();
+    void updateRequiredAmount(double required);
+    void updatePaidAmount(double paid);
 
-    void updateParticipantPaid(const User& u, double newValue);
+    void settleParticipantPayment(const User& user, double newValue);
 
-    void removeParticipant(User& u);
     void deleteSharedTransaction();
 };
