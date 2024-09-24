@@ -6,6 +6,7 @@
 #include "User.hpp"
 #include "Participant.hpp"
 #include "Date.hpp"
+#include "Logger.hpp"
 
 
 using namespace std;
@@ -52,15 +53,15 @@ public:
     bool createSavingPlanTable();
     void insertSavingPlan(int userId , SavingPlan plan);
     void printSavingPlans();
-    void updateSavingPlan(int planId, double newTarget,  Date &newStartDate,  Date &newEndDate);
-    void deleteSavingPlan(int planId);
-    void UpdateSavingAmount(int planId,double newAmount);
+    void updateSavingPlan(int userId,int planId, double newTarget,  const Date &newStartDate, const Date &newEndDate);
+    void deleteSavingPlan(int planId , int userId);
+    void UpdateSavingAmount(int userId,int planId,double newAmount);
 
     bool createTransactionTable();
     void insertTransaction(int userId , Transaction &transaction) ;
     void printTransactions();
     void updateTransaction(int userId, int transactionId,TransactionType type, Categories category, double value);
-    void deleteTransaction(int transactionId);
+    void deleteTransaction(int userId,int transactionId);
     
 
     bool createParticipantTable();

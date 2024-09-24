@@ -11,10 +11,10 @@
 
 using namespace std;
 
-enum LogLevel {
-    Info,
-    Error,
-    Warn
+enum class LogLevel {
+    INFO,
+    ERROR,
+    WARN
 };
 
 class Logger {
@@ -26,7 +26,7 @@ private:
     Logger(const Logger&) = delete;
     Logger& operator=(const Logger&) = delete;
     string getCurrentTime();
-    string printType(LogLevel t);
+    string toStringType(LogLevel t);
     ~Logger();
 
 public:
@@ -39,7 +39,7 @@ public:
             char buffer[256];
             snprintf(buffer, sizeof(buffer), message, args...);
             logFile << "By : " << userName << " || " << getCurrentTime() << " - "
-                    << printType(type) << ": " << buffer << endl;
+                    << toStringType(type) << ": " << buffer << endl;
         } else {
             cerr << "Log file is not open" << endl;
         }

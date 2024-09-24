@@ -30,9 +30,9 @@ public:
     int getUserId() const;
     void setUserId(int id);
 
-    void setSavingPlan(double target, const Date& startDate, const Date& endDate);
+    void setSavingPlan(double target, const Date &startDate, const Date &endDate);
     void deleteSavingPlan(int planId);
-    void updateSavingPlan(int planId, double newTarget, Date& newStartDate, Date& newEndDate);
+    void updateSavingPlan(int planId, double newTarget, const Date& newStartDate, const Date& newEndDate);
     void addSavingAmount(int planId , double newAmount);
 
     void updateTransaction(int transId, TransactionType type, Categories category, double value);

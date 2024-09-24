@@ -1,6 +1,6 @@
 #include "DataBaseManager.hpp"
 #include <iostream>
-
+#include "Logger.hpp"
 
 using namespace std;
 
@@ -8,19 +8,21 @@ DataBaseManager* DataBaseManager::instance = nullptr;
 mutex DataBaseManager::instanceMutex;
 
 DataBaseManager& DataBaseManager::getInstance() {
-    lock_guard<mutex> lock(mutex);  
+    lock_guard<mutex> lock(instanceMutex);
     if (instance == nullptr) {
         instance = new DataBaseManager();
     }
     return *instance;
 }
 
+
 DataBaseManager::DataBaseManager() : dbName("Wallet.db"), db(nullptr) {
     int exit = sqlite3_open(dbName.c_str(), &db);
     if (exit) {
-        cerr << "Cannot open database: " << sqlite3_errmsg(db) << endl;
+        Logger::getInstance()->log(LogLevel::ERROR,"", "Cannot open database: %s", sqlite3_errmsg(db));
     } else {
-        cout << "Opened database successfully." << endl;
+        Logger::getInstance()->log(LogLevel::INFO, "", "Opened database successfully: %s", dbName.c_str());
+        
         createUserTable();
         createCategoryBudgetTable();
         createSavingPlanTable();
@@ -31,6 +33,7 @@ DataBaseManager::DataBaseManager() : dbName("Wallet.db"), db(nullptr) {
 
 DataBaseManager::~DataBaseManager() {
     if (db) {
+        Logger::getInstance()->log(LogLevel::INFO, " ", "Closed database: %s", dbName.c_str());
         sqlite3_close(db);
     }
 }
@@ -39,13 +42,11 @@ bool DataBaseManager::executeSQL(const string& sql) {
     char *errMsg = nullptr;
     int exe = sqlite3_exec(db, sql.c_str(), 0, 0, &errMsg);
     if (exe != SQLITE_OK) {
-        cerr << "SQL execution failed: " << errMsg << endl;
         sqlite3_free(errMsg);
         return false;
     }
     return true;
 }
-
 
 
 bool DataBaseManager::createUserTable() {
@@ -95,55 +96,89 @@ bool DataBaseManager::createCategoryBudgetTable() {
         "userId INTEGER NOT NULL, "
         "category INTEGER NOT NULL, "
         "budget REAL NOT NULL, "
+        "PRIMARY KEY (userId, category),"
         "FOREIGN KEY (userId) REFERENCES User(userId) ON DELETE CASCADE);";
     return executeSQL(sqlTable);
 }
 void DataBaseManager::setCategoryBudget(int userId, Categories category, double newBudget) {
-    const string checkSql = "SELECT COUNT(*) FROM CategoryBudget WHERE userId = "
+    const string checkSql = "SELECT COUNT(*), budget FROM CategoryBudget WHERE userId = "
                             + to_string(userId) + " AND category = " + to_string(static_cast<int>(category)) + ";";
 
     char* errMsg = nullptr;
-    int existingBudget = 0; 
+    int budgetExists = 0;
+    double amount = 0.0;
+    
+    void* data[2];
+    data[0] = &budgetExists; 
+    data[1] = &amount; 
 
-    auto callback = [](void *data, int argc, char **argv, char **azColName) -> int {
+    auto callback = [](void* data, int argc, char** argv, char** azColName) -> int {
+        void** values = static_cast<void**>(data);  
+        
+        int* budgetExistsPtr = static_cast<int*>(values[0]); 
+        double* amountPtr = static_cast<double*>(values[1]); 
+        
         if (argc > 0 && argv[0]) {
-            int* budgetPtr = static_cast<int*>(data); 
-            *budgetPtr = atoi(argv[0]); 
+            *budgetExistsPtr = atoi(argv[0]); 
+        }
+        if (argc > 1 && argv[1]) {
+            *amountPtr = atof(argv[1]); 
         }
         return 0;
     };
 
-    int rc = sqlite3_exec(db, checkSql.c_str(), callback, &existingBudget, &errMsg);
+    int rc = sqlite3_exec(db, checkSql.c_str(), callback, data, &errMsg);
     if (rc != SQLITE_OK) {
-        cerr << "SQL error: " << errMsg << endl;
         sqlite3_free(errMsg);
         return;
     }
 
-    if (existingBudget>0){
-        updateCategoryBudget(userId, category, newBudget,existingBudget);
+    if (budgetExists > 0) {
+        updateCategoryBudget(userId, category, newBudget, amount); 
     } else {
         insertCategoryBudget(userId, category, newBudget);
     }
 }
 void DataBaseManager::insertCategoryBudget(int userId, Categories category, double budget) {
     const string sql = "INSERT INTO CategoryBudget (userId, category, budget) VALUES ("
-        + to_string(userId) + ", '"
-        + to_string(static_cast<int>(category)) + "', "
+        + to_string(userId) + ","
+        + to_string(static_cast<int>(category)) + ", "
         + to_string(budget) + ");";
-    executeSQL(sql);
-}
-void DataBaseManager::updateCategoryBudget(int userId, Categories category, double newBudget,double existingBudget) {
-    if(existingBudget >= newBudget ){
-        std::cout << "Can't set budget to a smaller value.";
-    }else{
-    const string sql = "UPDATE CategoryBudget SET budget = " 
-        + to_string(newBudget) + " WHERE userId = " + to_string(userId) 
-        + " AND category = '" + to_string(static_cast<int>(category)) + "';";
-    executeSQL(sql);
+
+    bool rc = executeSQL(sql); 
+
+    if (!rc) { 
+        Logger::getInstance()->log(LogLevel::ERROR, 
+            "User Id: " + to_string(userId), 
+            "Failed to insert category budget for category: %s.", 
+            toStringCategory(category));
+    } else { 
+        Logger::getInstance()->log(LogLevel::INFO, 
+            "User Id: " + to_string(userId), 
+            "Successfully inserted category budget for category: %s.", 
+            toStringCategory(category));
     }
 }
-bool DataBaseManager::isBudgetExceeded(int userId, Categories category, double amount){
+void DataBaseManager::updateCategoryBudget(int userId, Categories category, double newBudget, double existingBudget) {
+    if (existingBudget >= newBudget) {
+        Logger::getInstance()->log(LogLevel::ERROR, 
+            "User Id: " + to_string(userId) , " Failed to update category budget for category: %s ,Cannot set a value lower than the current one.", toStringCategory(category));
+    }else{
+        const string sql = "UPDATE CategoryBudget SET budget = " 
+            + to_string(newBudget) + " WHERE userId = " + to_string(userId) 
+            + " AND category = '" + to_string(static_cast<int>(category)) + "';";
+
+        bool rc = executeSQL(sql);
+        if (!rc) {
+            Logger::getInstance()->log(LogLevel::ERROR, 
+                "User Id: " + to_string(userId) , " Failed to update category budget for category: %s.", toStringCategory(category));
+        }else{
+            Logger::getInstance()->log(LogLevel::INFO, 
+                "User Id: " + to_string(userId) , " Update category budget for category: %s to: %0.2f.", toStringCategory(category),newBudget);
+        }
+    }
+}
+bool DataBaseManager::isBudgetExceeded(int userId, Categories category, double amount) {
     const string budgetQuery = "SELECT budget FROM CategoryBudget WHERE userId = " + to_string(userId) +
                                " AND category = " + to_string(static_cast<int>(category)) + ";";
 
@@ -152,23 +187,24 @@ bool DataBaseManager::isBudgetExceeded(int userId, Categories category, double a
 
     auto budgetCallback = [](void* data, int argc, char** argv, char** azColName) -> int {
         if (argc > 0 && argv[0]) {
-            *(static_cast<double*>(data)) = atof(argv[0]); 
+            *(static_cast<double*>(data)) = atof(argv[0]);
         }
         return 0;
     };
 
     int rc = sqlite3_exec(db, budgetQuery.c_str(), budgetCallback, &budget, &errMsg);
     if (rc != SQLITE_OK) {
-        cerr << "SQL error in budget query: " << errMsg << endl;
+        Logger::getInstance()->log(LogLevel::ERROR, 
+            "User Id: " + to_string(userId) , " Failed to query budget for category:%s . Error:%s." ,toStringCategory(category) , errMsg);
         sqlite3_free(errMsg);
-        return false; 
+        return false;
     }
 
-    if (calculateTotalExponses(userId,category) + amount > budget) {
-        return true; 
+    if (calculateTotalExponses(userId, category) + amount > budget) {
+        return true;
     }
 
-    return false; 
+    return false;
 }
 void DataBaseManager::printCategoryBudgetTable()  {
     const string sqlQuery = "SELECT * FROM CategoryBudget;";
@@ -185,11 +221,9 @@ void DataBaseManager::printCategoryBudgetTable()  {
 
     int rc = sqlite3_exec(db, sqlQuery.c_str(), callback, nullptr, &errMsg);
     if (rc != SQLITE_OK) {
-        cerr << "SQL error: " << errMsg << endl;
         sqlite3_free(errMsg);
     }
 }
-
 
 
 
@@ -205,15 +239,26 @@ bool DataBaseManager::createSavingPlanTable() {
         "FOREIGN KEY (userId) REFERENCES User(userId) ON DELETE CASCADE);";
     return executeSQL(sqlTable);
 }
-void DataBaseManager::insertSavingPlan(int userId ,SavingPlan plan) {
+void DataBaseManager::insertSavingPlan(int userId, SavingPlan plan) {
     const string sql = "INSERT INTO SavingPlan (userId, savingAmount, target, startDate, endDate) VALUES (" 
         + to_string(userId) + ", " 
         + to_string(plan.getSavingAmount()) + ", " 
         + to_string(plan.getTarget()) + ", '" 
         + plan.getStartDate().toString() + "', '" 
         + plan.getEndDate().toString() + "');";
-    executeSQL(sql);
-    plan.setId(sqlite3_last_insert_rowid(db));
+
+    bool success = executeSQL(sql); 
+
+    if (success) {
+        plan.setId(sqlite3_last_insert_rowid(db)); 
+        Logger::getInstance()->log(LogLevel::INFO, 
+            "User Id: " + to_string(userId), 
+            "Inserted new saving plan ID: %d  with target:%0.2f. " ,plan.getId(),plan.getTarget());
+    } else {
+        Logger::getInstance()->log(LogLevel::ERROR, 
+            "User Id: " + to_string(userId), 
+            "Failed to insert new saving plan with target:%0.2f ." ,plan.getTarget());
+    }
 }
 void DataBaseManager::printSavingPlans() {
     const string sql = "SELECT * FROM SavingPlan;";
@@ -238,104 +283,78 @@ void DataBaseManager::printSavingPlans() {
         cout << "Saving Plans:\n" << result << endl;
     }
 }
-void DataBaseManager::updateSavingPlan(int planId, double newTarget,  Date &newStartDate,  Date &newEndDate) {
-    const string checkplans = "SELECT COUNT(*) FROM SavingPlan WHERE planId = " + to_string(planId) + ";";
-
+void DataBaseManager::updateSavingPlan(int userId, int planId, double newTarget, const Date &newStartDate, const Date &newEndDate) {
     char* errMsg = nullptr;
-    int planExists = 0; 
-
-    auto callback = [](void *data, int argc, char **argv, char **azColName) -> int {
-        int* exists = static_cast<int*>(data);
-        if (argc > 0 && argv[0]) {
-            *exists = atoi(argv[0]); 
-        }
-        return 0;
-    };
-
-    int rc = sqlite3_exec(db, checkplans.c_str(), callback, &planExists, &errMsg);
-    if (rc != SQLITE_OK) {
-        cerr << "SQL error: " << errMsg << endl;
-        sqlite3_free(errMsg);
-        return;
-    }
-
-    if (planExists > 0) {
-        const string updateSql = "UPDATE SavingPlan SET "
+    const string updateSql = "UPDATE SavingPlan SET "
                                  "target = " + to_string(newTarget) + ", "
                                  "startDate = '" + newStartDate.toString() + "', "
                                  "endDate = '" + newEndDate.toString() + "' "
-                                 "WHERE planId = " + to_string(planId) + ";";
-        
-        rc = sqlite3_exec(db, updateSql.c_str(), nullptr, nullptr, &errMsg);
-        if (rc != SQLITE_OK) {
-            cerr << "SQL error in update: " << errMsg << endl;
-            sqlite3_free(errMsg);
-        } else {
-            cout << "Saving plan with ID " << planId << " updated successfully." << endl;
-        }
+                                 "WHERE planId = " + to_string(planId) + " AND userId = " + to_string(userId) + ";";
+
+    int rc = sqlite3_exec(db, updateSql.c_str(), nullptr, nullptr, &errMsg);
+    if (rc != SQLITE_OK) {
+        Logger::getInstance()->log(LogLevel::ERROR, 
+            "User Id: " + to_string(userId) , " Failed to update saving plan with ID:%d . Error:%s ." ,planId, string(errMsg));
+        sqlite3_free(errMsg);
     } else {
-        cout << "Saving plan with ID " << planId << " not found." << endl;
+        Logger::getInstance()->log(LogLevel::INFO, 
+            "User Id: " + to_string(userId) , " Updated saving plan with ID:%d ." ,planId);
     }
 }
-void DataBaseManager::deleteSavingPlan(int planId) {
-    const string checkplans = "SELECT COUNT(*), savingAmount, userId FROM SavingPlan WHERE planId = " + to_string(planId) + ";";
+void DataBaseManager::deleteSavingPlan(int planId, int userId) {
+    const string checkplans = "SELECT COUNT(*), savingAmount FROM SavingPlan WHERE planId = " + to_string(planId) + ";";
     
     char* errMsg = nullptr;
     int planExists = 0;
     double amount = 0.0;
-    int userId = 0;
-
-    void* data[3];
+    
+    void* data[2];
     data[0] = &planExists;
     data[1] = &amount;
-    data[2] = &userId;
-
+  
     auto callback = [](void *data, int argc, char **argv, char **azColName) -> int {
         void** values = static_cast<void**>(data);  
         int* exists = static_cast<int*>(values[0]);
         double* amount = static_cast<double*>(values[1]);
-        int* userId = static_cast<int*>(values[2]);
-
         if (argc > 0 && argv[0]) {
             *exists = atoi(argv[0]);
         }
         if (argc > 1 && argv[1]) {
             *amount = atof(argv[1]);
         }
-        if (argc > 2 && argv[2]) {
-            *userId = atoi(argv[2]);
-        }
-
         return 0;
     };
 
     int rc = sqlite3_exec(db, checkplans.c_str(), callback, data, &errMsg);
     if (rc != SQLITE_OK) {
-        cerr << "SQL error: " << errMsg << endl;
+        Logger::getInstance()->log(LogLevel::ERROR, 
+            "User Id: " + to_string(userId) , " Failed to check saving plan existence for ID:%d . Error:%s." ,planId ,string(errMsg));
         sqlite3_free(errMsg);
         return;
     }
 
     if (planExists > 0) {
-        if(amount> 0.0){
+        if (amount > 0.0) {
             Transaction newTransaction(amount, Categories::NONE, TransactionType::DEPOSIT);
             insertTransaction(userId, newTransaction);
         }
-        const string deleteSql = "DELETE FROM SavingPlan WHERE planId = " + to_string(planId) + ";";
         
+        const string deleteSql = "DELETE FROM SavingPlan WHERE planId = " + to_string(planId) + ";";
         rc = sqlite3_exec(db, deleteSql.c_str(), nullptr, nullptr, &errMsg);
         if (rc != SQLITE_OK) {
-            cerr << "SQL error in delete plan: " << errMsg << endl;
+            Logger::getInstance()->log(LogLevel::ERROR, 
+                "User Id: " + to_string(userId) , " Failed to delete saving plan with ID:%d . Error:%s." ,planId, string(errMsg));
             sqlite3_free(errMsg);
         } else {
-            cout << "Saving plan with ID " << planId << " deleted successfully." << endl;
-        }
-
+            Logger::getInstance()->log(LogLevel::INFO, 
+                "User Id: " + to_string(userId) , " Deleted saving plan with ID:%d " ,planId);
+                  }
     } else {
-        cout << "Saving plan with ID " << planId << " not found." << endl;
-    }
+        Logger::getInstance()->log(LogLevel::ERROR, 
+            "User Id: " + to_string(userId) , " Saving plan with ID:%d  not found." ,planId);
+     }
 }
-void DataBaseManager::UpdateSavingAmount(int planId, double newAmount) {
+void DataBaseManager::UpdateSavingAmount(int userId, int planId, double newAmount) {
     const string checkPlans = "SELECT COUNT(*), savingAmount FROM SavingPlan WHERE planId = " + to_string(planId) + ";";
 
     char* errMsg = nullptr;
@@ -363,7 +382,6 @@ void DataBaseManager::UpdateSavingAmount(int planId, double newAmount) {
 
     int rc = sqlite3_exec(db, checkPlans.c_str(), callback, data, &errMsg);
     if (rc != SQLITE_OK) {
-        cerr << "SQL error: " << errMsg << endl;
         sqlite3_free(errMsg);
         return;
     }
@@ -375,14 +393,18 @@ void DataBaseManager::UpdateSavingAmount(int planId, double newAmount) {
         
         rc = sqlite3_exec(db, updateSql.c_str(), nullptr, nullptr, &errMsg);
         if (rc != SQLITE_OK) {
-            cerr << "SQL error in update: " << errMsg << endl;
+            Logger::getInstance()->log(LogLevel::ERROR, 
+                "User Id: " + to_string(userId) , " Failed to update saving amount for plan ID:%d. Error:%s.",planId
+                ,string(errMsg));
             sqlite3_free(errMsg);
         } else {
-            cout << "Saving plan with ID " << planId << " updated successfully." << endl;
+            Logger::getInstance()->log(LogLevel::INFO, 
+                "User Id: " + to_string(userId) , " Updated saving amount for plan ID:%d to %0.2f." ,planId,existingAmount + newAmount);
         }
     } else {
-        cout << "Saving plan with ID " << planId << " not found." << endl;
-    }
+        Logger::getInstance()->log(LogLevel::ERROR, 
+            "User Id: " + to_string(userId), " Saving plan ID:%d  not found." ,planId);
+      }
 }
 
 
@@ -402,17 +424,33 @@ bool DataBaseManager::createTransactionTable() {
 void DataBaseManager::insertTransaction(int userId, Transaction &transaction) {
     const string sql = "INSERT INTO \"Transaction\" (userId, amount, category, type, date) VALUES ("
         + to_string(userId) + ", "
-        + to_string(transaction.getAmount()) + ", '"
-        + to_string(static_cast<int>(transaction.getCategory())) + "', '"
-        + to_string(static_cast<int>(transaction.getTransactionType())) + "', '"
+        + to_string(transaction.getAmount()) + ", "
+        + to_string(static_cast<int>(transaction.getCategory())) + ", "
+        + to_string(static_cast<int>(transaction.getTransactionType())) + ", '"
         + transaction.getDate().toString() + "');";
-    executeSQL(sql);
+    bool success = executeSQL(sql);
+
     transaction.setTranId(sqlite3_last_insert_rowid(db));
+    
+    if(userId == 0 && success){
+        Logger::getInstance()->log(LogLevel::INFO, " ", 
+                    "Shared Transaction ID: %d created successfully for amount %.2f in category %s",
+                        sqlite3_last_insert_rowid(db), transaction.getAmount(), toStringCategory(transaction.getCategory()));
+    
+    }else if(userId != 0 && success){
+        Logger::getInstance()->log(LogLevel::INFO, "User Id: "+to_string(userId), 
+                    "Transaction ID: %d created successfully for amount %.2f in category %s",
+                        sqlite3_last_insert_rowid(db), transaction.getAmount(), toStringCategory(transaction.getCategory()));
+    
+    }else if(!success){
+         Logger::getInstance()->log(LogLevel::INFO, "User Id: "+to_string(userId), 
+                    "Failed to create Transaction ID: %d.",sqlite3_last_insert_rowid(db));
+    }
 }
 void DataBaseManager::printTransactions() {
     const string sql = "SELECT * FROM \"Transaction\";";
-    
     string result;
+
     auto callback = [](void *data, int argc, char **argv, char **azColName) -> int {
         string* output = static_cast<string*>(data);
         for (int i = 0; i < argc; i++) {
@@ -425,115 +463,61 @@ void DataBaseManager::printTransactions() {
     char *errMsg = nullptr;
     int rc = sqlite3_exec(db, sql.c_str(), callback, &result, &errMsg);
     if (rc != SQLITE_OK) {
-        cerr << "Error: " << errMsg << endl;
-        sqlite3_free(errMsg);
+      sqlite3_free(errMsg);
     } else {
-        cout << "Transactions:\n" << result << endl;
+    cout << "Transactions:\n" << result << endl;
     }
 }
 void DataBaseManager::updateTransaction(int userId, int transactionId, TransactionType type, Categories category, double value) {
-    int currentType = 0;  
+    int currentType = 0;
     double currentAmount = 0.0;
     int currentCategory = 0;
 
     void* data[3];
     data[0] = &currentType;
     data[1] = &currentAmount;
-    data[2] = &currentCategory;  
+    data[2] = &currentCategory;
 
     string selectQuery = "SELECT type, amount, category FROM \"Transaction\" WHERE transactionId = " + to_string(transactionId) +
                          " AND userId = " + to_string(userId) + ";";
 
     auto callback = [](void* data, int argc, char** argv, char** azColName) -> int {
-        void** values = static_cast<void**>(data);  
+        void** values = static_cast<void**>(data);
         int* typePtr = static_cast<int*>(values[0]);
         double* amountPtr = static_cast<double*>(values[1]);
-        int* categoryPtr = static_cast<int*>(values[2]);  
+        int* categoryPtr = static_cast<int*>(values[2]);
 
         if (argc > 2 && argv[0] && argv[1] && argv[2]) {
-            *typePtr = atoi(argv[0]);  
+            *typePtr = atoi(argv[0]);
             *amountPtr = atof(argv[1]);
-            *categoryPtr = atoi(argv[2]);  
+            *categoryPtr = atoi(argv[2]);
         }
         return 0;
     };
 
-    int rc = sqlite3_exec(db, selectQuery.c_str(), callback, data , nullptr);
-    if (rc != SQLITE_OK ) {
-        cerr << "Failed to retrieve transaction data.\n";
-        return;
+    int rc = sqlite3_exec(db, selectQuery.c_str(), callback, data, nullptr);
+    if (rc != SQLITE_OK) {
+       return;
     }
-
-    Date date = Date();
-    if (currentType == static_cast<int>(type)) {
-        if (type == TransactionType::DEPOSIT) {
-            if ((currentAmount > value && (calculateTotalIncoms(userId) - calculateTotalExponses(userId) >= currentAmount - value)) || currentAmount < value) {
-                const string updateQuery = "UPDATE \"Transaction\" SET amount = " + to_string(value) +
-                                           ", category = " + to_string(static_cast<int>(Categories::NONE)) +
-                                           ", date = '" + date.toString() + "' WHERE transactionId = " + to_string(transactionId) +
-                                           " AND userId = " + to_string(userId) + ";";
-                int rc = sqlite3_exec(db, updateQuery.c_str(), nullptr, nullptr, nullptr);
-                if (rc != SQLITE_OK) {
-                    cerr << "SQL error: " << sqlite3_errmsg(db) << endl;
-                }
-            }
-        } else {
-            double amountDifference = value - currentAmount;
-            if (amountDifference <= 0 || 
-                (!isBudgetExceeded(userId, currentCategory != static_cast<int>(category) ? static_cast<Categories>(currentCategory) : category, 
-                    currentCategory != static_cast<int>(category) ? value : amountDifference) && amountDifference <= calculateTotalIncoms(userId) - calculateTotalExponses(userId))) {
-                    const string updateQuery = "UPDATE \"Transaction\" SET amount = " + to_string(value) +
-                                           ", category = " + to_string(static_cast<int>(category)) +
-                                           ", date = '" + date.toString() + "' WHERE transactionId = " + to_string(transactionId) +
-                                           " AND userId = " + to_string(userId) + ";";
-                int rc = sqlite3_exec(db, updateQuery.c_str(), nullptr, nullptr, nullptr);
-                if (rc != SQLITE_OK) {
-                    cerr << "SQL error: " << sqlite3_errmsg(db) << endl;
-                }
-            }
-        }
-
-    } else { 
-        if (type == TransactionType::DEPOSIT ) {
-            const string updateQuery = "UPDATE \"Transaction\" SET type = " + to_string(static_cast<int>(TransactionType::DEPOSIT)) +
-                                       ", amount = " + to_string(value) +
-                                       ", category = " + to_string(static_cast<int>(Categories::NONE)) +
-                                       ", date = '" + date.toString() + "' WHERE transactionId = " + to_string(transactionId) +
-                                       " AND userId = " + to_string(userId) + ";";
-            int rc = sqlite3_exec(db, updateQuery.c_str(), nullptr, nullptr, nullptr);
-            if (rc != SQLITE_OK) {
-                cerr << "SQL error: " << sqlite3_errmsg(db) << endl;
-            }
-        } else {
-            if (!isBudgetExceeded(userId, category, value) && value <= calculateTotalIncoms(userId) - calculateTotalExponses(userId)) {
-                const string updateQuery = "UPDATE \"Transaction\" SET type = " + to_string(static_cast<int>(TransactionType::WITHDRAW)) +
-                                           ", amount = " + to_string(value) +
-                                           ", category = " + to_string(static_cast<int>(category)) +
-                                           ", date = '" + date.toString() + "' WHERE transactionId = " + to_string(transactionId) +
-                                           " AND userId = " + to_string(userId) + ";";
-                int rc = sqlite3_exec(db, updateQuery.c_str(), nullptr, nullptr, nullptr);
-                if (rc != SQLITE_OK) {
-                    cerr << "SQL error: " << sqlite3_errmsg(db) << endl;
-                }
-            }
-        }
-    }
+    Logger::getInstance()->log(LogLevel::INFO, "User Id :" + to_string(userId),
+        "Transaction ID: %d updated successfully with new amount: %.2f, new category: %s",
+        transactionId, value, toStringCategory(category));
 }
-void DataBaseManager::deleteTransaction(int transactionId) {
+void DataBaseManager::deleteTransaction(int userId, int transactionId) {
     const string deleteSql = "DELETE FROM \"Transaction\" WHERE transactionId = " + to_string(transactionId) + ";";
-    
+
     char* errMsg = nullptr;
     int rc = sqlite3_exec(db, deleteSql.c_str(), nullptr, nullptr, &errMsg);
-    
+
     if (rc != SQLITE_OK) {
-        cerr << "SQL error in delete: " << errMsg << endl;
+        Logger::getInstance()->log(LogLevel::ERROR, "Failed to delete transaction",
+            "Transaction ID: %d, User ID: %d, Error: %s", transactionId, userId, errMsg);
         sqlite3_free(errMsg);
     } else {
-        cout << "Transaction deleted successfully or it didn't exist." << endl;
+        Logger::getInstance()->log(LogLevel::INFO, "Transaction deleted",
+            "Transaction ID: %d deleted successfully for User ID: %d", transactionId, userId);
     }
 }
-
-
 
 
 bool DataBaseManager::createParticipantTable() {
@@ -554,11 +538,15 @@ void DataBaseManager::insertParticipant(int userId, int transactionId, Participa
         + to_string(transactionId) + ", "
         + to_string(participant.getPaid()) + ", "
         + to_string(participant.getRequired()) + ");";
+    
+    Logger::getInstance()->log(LogLevel::INFO, "User Id :"+to_string(userId), "Inserting participant into TransactionID: %d, Paid: %.2f, Required: %.2f", 
+                                transactionId, participant.getPaid(), participant.getRequired());
+    
     executeSQL(sql);
 }
 void DataBaseManager::printParticipants() {
     const string sql = "SELECT * FROM Participant;";
-    
+
     string result;
     auto callback = [](void *data, int argc, char **argv, char **azColName) -> int {
         string* output = static_cast<string*>(data);
@@ -587,7 +575,7 @@ double DataBaseManager::calculateParticipantAmountRequired(int transactionId) {
         "FROM \"Transaction\" T "
         "LEFT JOIN Participant P ON T.transactionId = P.transactionId "
         "WHERE T.transactionId = " + to_string(transactionId) + ";";
-    
+
     double transactionAmount = 0;
     int participantCount = 0;
     char* errMsg = nullptr;
@@ -624,7 +612,8 @@ void DataBaseManager::updateRequiredAmount(int transactionId, double required) {
         cerr << "SQL error: " << errMsg << endl;
         sqlite3_free(errMsg);
     } else {
-       // cout <<"Updated required amount for all participants in transaction " << transactionId << " successfully." << endl;
+         Logger::getInstance()->log(LogLevel::INFO,"", "Updated required amount for Shared Transaction ID: %d to %.2f.", 
+                               transactionId, required);
     }
 }
 void DataBaseManager::updatePaidAmount(int transactionId, double paid) {
@@ -663,12 +652,11 @@ void DataBaseManager::updatePaidAmount(int transactionId, double paid) {
                 cerr << "SQL error in update: " << errMsg << endl;
                 sqlite3_free(errMsg);
             } else {
-                //cout << "Updated paid amount for participant " << userId << " successfully." << endl;
+                Logger::getInstance()->log(LogLevel::INFO, "", "Updated paid amount for UserID: %d in TransactionID: %d by %.2f", 
+                                           userId, transactionId, amountPerParticipant);
             }
         }
-    } else {
-        //cout << "No participants have paid more than the required amount." << endl;
-    }
+    } 
 }
 void DataBaseManager::settleParticipantPayment(int transactionId, int userId, double newValue) {
     const string selectQuery = "SELECT paidAmount, requiredAmount FROM Participant "
@@ -714,7 +702,8 @@ void DataBaseManager::settleParticipantPayment(int transactionId, int userId, do
         cerr << "SQL error in update: " << errMsg << endl;
         sqlite3_free(errMsg);
     } else {
-        //cout << "Updated paid amount for user " << userId << " in transaction " << transactionId << " successfully." << endl;
+        Logger::getInstance()->log(LogLevel::INFO, "User Id :"+to_string(userId), "Updated paid amount in TransactionID: %d to %.2f", 
+                                   transactionId, totalPaid);
     }
 }
 
@@ -837,7 +826,6 @@ const char *DataBaseManager::toStringType(TransactionType type) const{
     }
 }
 
-
 vector<vector<string>> DataBaseManager::executeQuery(const string& query) {
     vector<vector<string>> result;
     char* errorMessage = nullptr;
@@ -862,10 +850,10 @@ vector<vector<string>> DataBaseManager::executeQuery(const string& query) {
     return result;
 }
 void DataBaseManager::generateTransactionReport(const Date &d1, const Date &d2, int userId) {
-    string query = 
+     string query = 
         "SELECT transactionId, amount, category, type, date FROM \"Transaction\" "
-        "WHERE userId = " + to_string(userId) + 
-        " AND date BETWEEN '" + d1.toString() + "' AND '" + d2.toString() + "';";
+        "WHERE userId = " + to_string(userId) +
+        " AND date BETWEEN '" + d1.toString() + "' AND '" + d2.toString() + "' ;";
 
     vector<vector<string>> result = executeQuery(query);
 
@@ -880,10 +868,10 @@ void DataBaseManager::generateTransactionReport(const Date &d1, const Date &d2, 
 void DataBaseManager::genarateSharedTransactionReport(const Date &d1, const Date &d2, int userId) {
     string query = 
         "SELECT ST.transactionId, ST.amount, ST.date, P.paidAmount, P.requiredAmount "
-        "FROM \"Transaction\" ST JOIN Participant P ON ST.transactionId = P.transactionId "
-        "WHERE P.userId = " + to_string(userId) + 
+        "FROM \"Transaction\" ST JOIN Participant P ON ST.transactionId == P.transactionId "
+        "WHERE P.userId = " + to_string(userId) +
         " AND ST.date BETWEEN '" + d1.toString() + "' AND '" + d2.toString() + "';";
-
+    
     vector<vector<string>> result = executeQuery(query);
 
     cout << "TransactionId | Amount | Date | PaidAmount | RequiredAmount\n";

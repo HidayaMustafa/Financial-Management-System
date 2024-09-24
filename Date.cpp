@@ -27,8 +27,8 @@ bool Date::operator<=(const Date& d) const {
 
 int Date::operator-(const Date& d) const {
     tm tm1 = {};
-    tm1.tm_year = year - 1900; // tm_year is years since 1900
-    tm1.tm_mon = month - 1;    // tm_mon is months since January (0-based)
+    tm1.tm_year = year - 1900; 
+    tm1.tm_mon = month - 1;    
     tm1.tm_mday = day;
 
     tm tm2 = {};
@@ -50,6 +50,6 @@ void Date::display() const {
          << year;
 }
 
-string Date::toString()const {
-    return to_string(day) + "/" + to_string(month) + "/" +to_string(year);
+string Date::toString() const {
+    return to_string(year) + "-" + (month < 10 ? "0" : "") + to_string(month) + "-" + (day < 10 ? "0" : "") + to_string(day);
 }

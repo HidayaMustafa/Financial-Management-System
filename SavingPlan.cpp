@@ -1,8 +1,9 @@
 #include "SavingPlan.hpp"
+#include "Logger.hpp"
 
-SavingPlan::SavingPlan(double newtarget, Date newStartDate, Date newEndDate, std::string Name)
-    :savingAmount(0), target(newtarget), startDate(newStartDate), endDate(newEndDate), name(Name) {
-}
+SavingPlan::SavingPlan(double newTarget, Date newStartDate, Date newEndDate)
+    : savingAmount(0), target(newTarget), startDate(newStartDate), endDate(newEndDate) {
+    }
 
 SavingPlan::~SavingPlan() {
 }
@@ -10,8 +11,9 @@ SavingPlan::~SavingPlan() {
 int SavingPlan::getId() const {
     return id;
 }
-void SavingPlan::setId(int ID){
-    id= ID;
+
+void SavingPlan::setId(int ID) {
+    id = ID;
 }
 
 double SavingPlan::getSavingAmount() const {
@@ -29,31 +31,15 @@ void SavingPlan::setEndDate(const Date& d1) {
 Date SavingPlan::getStartDate() {
     return startDate;
 }
-
 Date SavingPlan::getEndDate() {
-    return endDate ;
+    return endDate;
 }
 
 void SavingPlan::setTarget(double t) {
     target = t;
 }
-double SavingPlan::getTarget() const{
+
+double SavingPlan::getTarget() const {
     return target;
 }
 
-void SavingPlan::checkSavingPlan() const {
-    double amountToSave = target - savingAmount;
-
-    if (amountToSave <= 0) {
-        Logger::getInstance()->log(Info, name, "Good job, You have met your saving target in %d days.", (endDate - startDate));
-        return;
-    }
-
-    Date currentDate = Date();
-    int remainingDays = endDate - currentDate;
-    if (remainingDays <= 0) {
-        Logger::getInstance()->log(Error, name, "You didn't achieve your savings target within the time limit.");
-    } else {
-        Logger::getInstance()->log(Warn, name, "You still need to save %.2f$ to meet your target. %d days remaining.", amountToSave, remainingDays);
-    }
-}
