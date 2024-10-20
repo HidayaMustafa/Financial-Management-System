@@ -12,9 +12,9 @@
 using namespace std;
 
 enum LogLevel {
-    Info,
-    Error,
-    Warn
+    INFO,
+    ERROR,
+    WARN
 };
 
 class Logger {

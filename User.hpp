@@ -17,8 +17,8 @@ class SharedTransaction;
 
 class User {
 private:
-    int id;
-    string name;
+    int userId;
+    string userName;
     vector<unique_ptr<SavingPlan>> plans;
     unordered_map<Categories, double> categoryBudgets;
     mutable vector<Transaction*> transactions;
@@ -26,9 +26,12 @@ private:
 public:
     User(const string& Name, int Id);
     virtual ~User();
-    const string& getName() const;
-    int getId() const;
-    void setId(int i);
+
+    const string& getUserName() const;
+
+    int getUserId() const;
+    void setUserId(int i);
+
     void setSavingPlan(int id, double target, const Date& startDate, const Date& endDate);
     SavingPlan* getSavingPlan(int id);
     void deleteSavingPlan(int Id);

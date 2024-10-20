@@ -19,7 +19,7 @@ public:
 
     ~SavingPlan();
 
-    int getId() const;
+    int getPlanId() const;
     double getSavingAmount() const;
     void setStartDate(const Date& d1);
     void setEndDate(const Date& d1);

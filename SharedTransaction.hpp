@@ -15,17 +15,17 @@ private:
 public:
     SharedTransaction(int id, double amount, Categories category,const User& initialParticipant);
     virtual ~ SharedTransaction()override;
-    void addParticipant(const User& u, double paid);
+    void addParticipant(const User& user, double paid);
     double CalculateParticipantAmountRequired();
-    void UpdateRequiredAmount(string name ,double required);
+    void UpdateRequiredAmount(string userName ,double required);
 
-    void updateParticipantPaid(const User& u, double newValue);
+    void updateParticipantPaid(const User& user, double newValue);
 
-    void removeParticipant(User& u);
+    void removeParticipant(User& user);
 
     void printParticipants() const;
 
-    Participant* getParticipant(const User& u);
+    Participant* getParticipant(const User& user);
     
     std::vector <Participant*>getParticipants()const;
 

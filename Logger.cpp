@@ -21,12 +21,12 @@ string Logger::getCurrentTime() {
 
 string Logger::printType(LogLevel t) {
     switch (t) {
-        case Info:
-            return "Info";
-        case Warn:
-            return "Warn";
-        case Error:
-            return "Error";
+        case INFO:
+            return "INFO";
+        case WARN:
+            return "WORN";
+        case ERROR:
+            return "ERROR";
         default:
             return "Unknown";
     }

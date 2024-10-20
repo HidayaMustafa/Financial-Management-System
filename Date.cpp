@@ -4,9 +4,9 @@ Date::Date() {
     auto now = chrono::system_clock::to_time_t(chrono::system_clock::now());
     tm* localTime = localtime(&now);
 
-    day = localTime->tm_mday;
-    month = localTime->tm_mon + 1;
-    year = localTime->tm_year + 1900;
+    day = localTime->tmDay;
+    month = localTime->tmMon + 1;
+    year = localTime->tmYear + 1900;
 }
 
 Date::Date(int d, int m, int y) : day(d), month(m), year(y) {}
@@ -27,14 +27,14 @@ bool Date::operator<=(const Date& d) const {
 
 int Date::operator-(const Date& d) const {
     tm tm1 = {};
-    tm1.tm_year = year - 1900; // tm_year is years since 1900
-    tm1.tm_mon = month - 1;    // tm_mon is months since January (0-based)
-    tm1.tm_mday = day;
+    tm1.tmYear = year - 1900; // tm_year is years since 1900
+    tm1.tmMon = month - 1;    // tm_mon is months since January (0-based)
+    tm1.tmDay = day;
 
     tm tm2 = {};
-    tm2.tm_year = d.year - 1900;
-    tm2.tm_mon = d.month - 1;
-    tm2.tm_mday = d.day;
+    tm2.tmYear = d.year - 1900;
+    tm2.tmYear = d.month - 1;
+    tm2.tmYear = d.day;
 
     time_t time1 = std::mktime(&tm1);
     time_t time2 = std::mktime(&tm2);
